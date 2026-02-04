@@ -42,6 +42,7 @@ export const users = pgTable('users', {
 export const tiposGas = pgTable('tipos_gas', {
     id: serial('id').primaryKey(),
     nome: text('nome').notNull().unique(), // Ex: "OXIGÊNIO INDUSTRIAL"
+    tipo: text('tipo').default('cilindro').notNull(), // 'cilindro', 'liquido', 'ambos'
     ativo: boolean('ativo').default(true).notNull(),
     ordem: integer('ordem').default(0), // Para ordenação customizada
     createdAt: timestamp('created_at').defaultNow().notNull(),
