@@ -1,9 +1,32 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { propostas, propostaItens, unidades, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateProposalPDFStream } from "@/lib/pdf/generator";
+import fs from 'fs';
+import path from 'path';
+
+// Helper to load images as base64 (Critical for Vercel/Serverless)
+const getImageBase64 = (relativePath: string) => {
+    try {
+        const fullPath = path.join(process.cwd(), 'public', relativePath);
+        if (!fs.existsSync(fullPath)) {
+            console.warn(`Image not found: ${fullPath}`);
+            return null;
+        }
+        const fileBuffer = fs.readFileSync(fullPath);
+        const base64 = fileBuffer.toString('base64');
+        const ext = path.extname(fullPath).substring(1).toLowerCase();
+        // Handle jpg/jpeg
+        const mimeType = ext === 'png' ? 'image/png' : (ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'application/octet-stream');
+        return `data:${mimeType};base64,${base64}`;
+    } catch (e) {
+        console.error(`Error loading image ${relativePath}:`, e);
+        return null;
+    }
+}
 
 export async function GET(
     request: NextRequest,
@@ -32,6 +55,11 @@ export async function GET(
         if (user.role !== 'superadmin' && user.unidadeId !== proposal.unidadeId) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
+
+        // Preload Images
+        const logoSrc = getImageBase64('logo.png');
+        const heroGeneralSrc = getImageBase64('images/hero-general.png');
+        const heroLiquidSrc = getImageBase64('images/hero-liquid.png');
 
         // Reconstruct Data for PDF
         // We saved a snapshot! Use it if available to ensure immutability.
@@ -75,6 +103,11 @@ export async function GET(
                 },
                 seller: {
                     nome: seller.nome
+                },
+                images: {
+                    logo: logoSrc,
+                    heroGeneral: heroGeneralSrc,
+                    heroLiquid: heroLiquidSrc
                 }
             };
         } else {

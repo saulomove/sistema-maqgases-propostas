@@ -11,6 +11,8 @@ interface CylinderTemplateProps {
     unitAddress: string;
     unitPhone: string;
     unitEmail: string;
+    logoSrc?: string | null;
+    heroSrc?: string | null;
 }
 
 export const CylinderTemplatePage1 = ({
@@ -19,16 +21,22 @@ export const CylinderTemplatePage1 = ({
     unitName,
     unitAddress,
     unitPhone,
-    unitEmail
+    unitEmail,
+    logoSrc,
+    heroSrc
 }: CylinderTemplateProps) => (
     <Page size="A4" style={styles.page}>
         {/* HEADER */}
         <View style={styles.header}>
             <View>
-                <Image
-                    src="/Users/SauloMachado/Documents/Sistema - MaqGases - Propostas/sistema-maqgases-propostas/public/logo.png"
-                    style={styles.logo}
-                />
+                {/* Logo Image with handling for missing source */}
+                {logoSrc ? (
+                    <Image src={logoSrc} style={styles.logo} />
+                ) : (
+                    <View style={{ ...styles.logo, backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 8 }}>Logo Missing</Text>
+                    </View>
+                )}
             </View>
             <View style={styles.headerRight}>
                 <Text style={styles.title}>PROPOSTA COMERCIAL</Text>
@@ -42,10 +50,12 @@ export const CylinderTemplatePage1 = ({
 
         {/* HERO SECTION */}
         <View style={{ marginBottom: 20 }}>
-            <Image
-                src="/Users/SauloMachado/Documents/Sistema - MaqGases - Propostas/sistema-maqgases-propostas/public/images/hero-general.png"
-                style={{ width: '100%', height: 160, borderRadius: 6, objectFit: 'cover' }}
-            />
+            {heroSrc ? (
+                <Image
+                    src={heroSrc}
+                    style={{ width: '100%', height: 160, borderRadius: 6, objectFit: 'cover' }}
+                />
+            ) : null}
         </View>
 
 

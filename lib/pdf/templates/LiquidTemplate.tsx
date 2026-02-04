@@ -11,6 +11,8 @@ interface LiquidTemplateProps {
     unitAddress: string;
     unitPhone: string;
     unitEmail: string;
+    logoSrc?: string | null;
+    heroSrc?: string | null;
 }
 
 export const LiquidTemplatePage1 = ({
@@ -19,16 +21,21 @@ export const LiquidTemplatePage1 = ({
     unitName,
     unitAddress,
     unitPhone,
-    unitEmail
+    unitEmail,
+    logoSrc,
+    heroSrc
 }: LiquidTemplateProps) => (
     <Page size="A4" style={styles.page}>
         {/* HEADER */}
         <View style={styles.header}>
             <View>
-                <Image
-                    src="/Users/SauloMachado/Documents/Sistema - MaqGases - Propostas/sistema-maqgases-propostas/public/logo.png"
-                    style={styles.logo}
-                />
+                {logoSrc ? (
+                    <Image src={logoSrc} style={styles.logo} />
+                ) : (
+                    <View style={{ ...styles.logo, backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 8 }}>Logo Missing</Text>
+                    </View>
+                )}
             </View>
             <View style={styles.headerRight}>
                 <Text style={styles.title}>PROPOSTA COMERCIAL</Text>
@@ -82,10 +89,12 @@ export const LiquidTemplatePage1 = ({
 
         {/* HERO IMAGE */}
         <View>
-            <Image
-                src="/Users/SauloMachado/Documents/Sistema - MaqGases - Propostas/sistema-maqgases-propostas/public/images/hero-liquid.png"
-                style={{ width: '100%', height: 250, borderRadius: 6, objectFit: 'cover' }}
-            />
+            {heroSrc ? (
+                <Image
+                    src={heroSrc}
+                    style={{ width: '100%', height: 250, borderRadius: 6, objectFit: 'cover' }}
+                />
+            ) : null}
             {/* Overlay Text embedded in image or separate view? Keeping it clean with just image as requested/implied by "Visão Tanques" */}
             <View style={{ position: 'absolute', bottom: 15, left: 15, backgroundColor: 'rgba(11, 155, 217, 0.9)', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 4 }}>
                 <Text style={{ fontSize: 10, color: 'white', fontWeight: 'bold' }}>

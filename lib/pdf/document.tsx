@@ -27,6 +27,11 @@ interface ProposalData {
     seller: {
         nome: string;
     };
+    images?: {
+        logo: string | null;
+        heroGeneral: string | null;
+        heroLiquid: string | null;
+    };
 }
 
 export const ProposalDocument = ({ data }: { data: ProposalData }) => {
@@ -41,6 +46,8 @@ export const ProposalDocument = ({ data }: { data: ProposalData }) => {
                     unitAddress={data.unit.endereco}
                     unitPhone={data.unit.telefone}
                     unitEmail={data.unit.email}
+                    logoSrc={data.images?.logo}
+                    heroSrc={data.images?.heroLiquid}
                 />
             ) : (
                 <CylinderTemplatePage1
@@ -50,6 +57,8 @@ export const ProposalDocument = ({ data }: { data: ProposalData }) => {
                     unitAddress={data.unit.endereco}
                     unitPhone={data.unit.telefone}
                     unitEmail={data.unit.email}
+                    logoSrc={data.images?.logo}
+                    heroSrc={data.images?.heroGeneral}
                 />
             )}
 
