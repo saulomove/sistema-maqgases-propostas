@@ -67,16 +67,14 @@ async function seed() {
         let ordem = 1;
         for (const valor of capacidadesKg) {
             await db.insert(capacidades).values({
-                valor: valor.toString(),
-                unidade: 'kg',
+                tamanho: `${valor} kg`,
                 ordem: ordem++,
             }).onConflictDoNothing();
         }
 
         for (const valor of capacidadesM3) {
             await db.insert(capacidades).values({
-                valor: valor.toString(),
-                unidade: 'm3',
+                tamanho: `${valor} m³`,
                 ordem: ordem++,
             }).onConflictDoNothing();
         }

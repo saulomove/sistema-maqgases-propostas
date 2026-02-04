@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils"
 
 // Types
 type GasType = { id: number; nome: string }
-type Capacity = { id: number; valor: string; unidade: string }
+type Capacity = { id: number; tamanho: string }
 type UnitMeasure = { id: number; nome: string }
 type PaymentTerm = { id: number; descricao: string }
 
@@ -441,7 +441,7 @@ export function ProposalWizard({
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     {capacities.map(c => (
-                                                                        <SelectItem key={c.id} value={c.id.toString()}>{c.valor} {c.unidade}</SelectItem>
+                                                                        <SelectItem key={c.id} value={c.id.toString()}>{c.tamanho}</SelectItem>
                                                                     ))}
                                                                 </SelectContent>
                                                             </Select>
@@ -544,7 +544,7 @@ export function ProposalWizard({
                                                 <TableRow key={item.id}>
                                                     <TableCell>
                                                         {gas?.nome}
-                                                        {type === 'cilindro' && cap && <span className="text-muted-foreground ml-1">({cap.valor} {cap.unidade})</span>}
+                                                        {type === 'cilindro' && cap && <span className="text-muted-foreground ml-1">({cap.tamanho})</span>}
                                                     </TableCell>
                                                     <TableCell>
                                                         {Number(item.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} / {um?.nome}

@@ -10,8 +10,9 @@ import { revalidatePath } from "next/cache";
 // The project seems to use plain text comparison in auth? Let's check `lib/auth.ts` if possible, but safely assume we just store string.
 // Wait, `lib/auth` was not fully visible but user used `senha123`.
 
-export async function createUser(data: { email: string; senha?: string; role: 'superadmin' | 'unidade'; unidadeId?: number }) {
+export async function createUser(data: { nome: string; email: string; senha?: string; role: 'superadmin' | 'unidade'; unidadeId?: number }) {
     await db.insert(users).values({
+        nome: data.nome,
         email: data.email,
         senha: data.senha || 'senha123', // Default password
         role: data.role,
@@ -20,8 +21,9 @@ export async function createUser(data: { email: string; senha?: string; role: 's
     revalidatePath('/dashboard/admin/usuarios');
 }
 
-export async function updateUser(id: number, data: { email: string; role: 'superadmin' | 'unidade'; unidadeId?: number | null; senha?: string }) {
+export async function updateUser(id: number, data: { nome: string; email: string; role: 'superadmin' | 'unidade'; unidadeId?: number | null; senha?: string }) {
     const updateData: any = {
+        nome: data.nome,
         email: data.email,
         role: data.role,
         unidadeId: data.unidadeId

@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
         const getCapText = async (id: number) => {
             if (!id) return null;
             const [res] = await db.select().from(capacidades).where(eq(capacidades.id, id));
-            return res ? `${res.valor} ${res.unidade}` : null;
+            return res ? res.tamanho : null;
         };
         const getUMName = async (id: number) => {
             const [res] = await db.select().from(unidadesMedida).where(eq(unidadesMedida.id, id));

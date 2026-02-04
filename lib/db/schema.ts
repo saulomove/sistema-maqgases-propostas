@@ -53,8 +53,7 @@ export const tiposGas = pgTable('tipos_gas', {
 // ========================================
 export const capacidades = pgTable('capacidades', {
     id: serial('id').primaryKey(),
-    valor: decimal('valor', { precision: 10, scale: 2 }).notNull(), // Ex: 2.5, 10, 45
-    unidade: capacidadeUnidadeEnum('unidade').notNull(), // 'kg' ou 'm3'
+    tamanho: text('tamanho').notNull().unique(), // Ex: "45kg", "10m3"
     ativo: boolean('ativo').default(true).notNull(),
     ordem: integer('ordem').default(0),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -66,7 +65,7 @@ export const capacidades = pgTable('capacidades', {
 export const unidadesMedida = pgTable('unidades_medida', {
     id: serial('id').primaryKey(),
     nome: text('nome').notNull().unique(), // Ex: "Kg", "m³", "Unidade"
-    sigla: text('sigla'), // Ex: "kg", "m³"
+    sigla: text('sigla').notNull(), // Ex: "kg", "m³"
     ativo: boolean('ativo').default(true).notNull(),
     ordem: integer('ordem').default(0),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -78,6 +77,7 @@ export const unidadesMedida = pgTable('unidades_medida', {
 export const condicoesPagamento = pgTable('condicoes_pagamento', {
     id: serial('id').primaryKey(),
     descricao: text('descricao').notNull().unique(), // Ex: "Nota Fiscal / Boleto 14 dias"
+    dias: integer('dias').default(0).notNull(), // Prazo em dias
     ativo: boolean('ativo').default(true).notNull(),
     ordem: integer('ordem').default(0),
     createdAt: timestamp('created_at').defaultNow().notNull(),

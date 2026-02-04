@@ -21,6 +21,7 @@ import { Plus } from "lucide-react";
 export function UserDialog({ user, units, trigger }: { user?: any, units: any[], trigger?: React.ReactNode }) {
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
+        nome: user?.nome || '',
         email: user?.email || '',
         senha: '',
         role: user?.role || 'unidade',
@@ -33,6 +34,7 @@ export function UserDialog({ user, units, trigger }: { user?: any, units: any[],
             if (user) {
                 // Update
                 await updateUser(user.id, {
+                    nome: formData.nome,
                     email: formData.email,
                     role: formData.role as 'superadmin' | 'unidade',
                     unidadeId: formData.unidadeId ? parseInt(formData.unidadeId) : null,
@@ -42,6 +44,7 @@ export function UserDialog({ user, units, trigger }: { user?: any, units: any[],
             } else {
                 // Create
                 await createUser({
+                    nome: formData.nome,
                     email: formData.email,
                     senha: formData.senha,
                     role: formData.role as 'superadmin' | 'unidade',
@@ -68,6 +71,10 @@ export function UserDialog({ user, units, trigger }: { user?: any, units: any[],
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="nome" className="text-right">Nome</Label>
+                        <Input id="nome" value={formData.nome} onChange={e => setFormData({ ...formData, nome: e.target.value })} className="col-span-3" required autoFocus />
+                    </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="email" className="text-right">Email</Label>
                         <Input id="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="col-span-3" required />
