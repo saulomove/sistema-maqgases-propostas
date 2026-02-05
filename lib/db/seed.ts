@@ -23,44 +23,47 @@ async function seed() {
     try {
         // 1. TIPOS DE GÁS
         console.log('📦 Verificando tipos de gás...');
+        // Lista explícita com tipos para filtragem correta
         const gasTypes = [
-            'OXIGÊNIO INDUSTRIAL',
-            'OXIGÊNIO MEDICINAL',
-            'ARGÔNIO',
-            'FERROLINE',
-            'INOXLINE',
-            'ACETILENO',
-            'NITROGÊNIO',
-            'HIDROGÊNIO',
-            'ETIL',
-            'MAQMIX PREMIUM',
-            'DIÓXIDO DE CARBONO',
-            'DIÓXIDO DE CARBONO EP',
-            'AR MEDICINAL',
-            'ÓXIDO NITROSO',
-            'HÉLIO',
-            'OXIGÊNIO UP',
-            'ARGÔNIO UP',
-            'NITROGÊNIO UP',
-            'AR SINTÉTICO UP',
-            'HÉLIO UP',
-            'HIDROGÊNIO UP',
-            'OXIGÊNIO 6.0',
-            'HÉLIO LASERLINE',
-            'NITROGÊNIO LASERLINE',
-            'DIÓXIDO DE CARBONO LASERLINE',
-            'LASERLINE',
+            { nome: 'OXIGÊNIO INDUSTRIAL', tipo: 'cilindro' },
+            { nome: 'OXIGÊNIO MEDICINAL', tipo: 'cilindro' },
+            { nome: 'ARGÔNIO', tipo: 'cilindro' },
+            { nome: 'FERROLINE', tipo: 'cilindro' },
+            { nome: 'INOXLINE', tipo: 'cilindro' },
+            { nome: 'ACETILENO', tipo: 'cilindro' },
+            { nome: 'NITROGÊNIO', tipo: 'cilindro' },
+            { nome: 'HIDROGÊNIO', tipo: 'cilindro' },
+            { nome: 'ETIL', tipo: 'cilindro' },
+            { nome: 'MAQMIX PREMIUM', tipo: 'cilindro' },
+            { nome: 'DIÓXIDO DE CARBONO', tipo: 'liquido' }, // CO2 Líquido
+            { nome: 'DIÓXIDO DE CARBONO EP', tipo: 'cilindro' },
+            { nome: 'AR MEDICINAL', tipo: 'cilindro' },
+            { nome: 'ÓXIDO NITROSO', tipo: 'cilindro' },
+            { nome: 'HÉLIO', tipo: 'cilindro' },
+            { nome: 'OXIGÊNIO UP', tipo: 'cilindro' },
+            { nome: 'ARGÔNIO UP', tipo: 'cilindro' },
+            { nome: 'NITROGÊNIO UP', tipo: 'cilindro' },
+            { nome: 'AR SINTÉTICO UP', tipo: 'cilindro' },
+            { nome: 'HÉLIO UP', tipo: 'cilindro' },
+            { nome: 'HIDROGÊNIO UP', tipo: 'cilindro' },
+            { nome: 'OXIGÊNIO 6.0', tipo: 'cilindro' },
+            { nome: 'HÉLIO LASERLINE', tipo: 'cilindro' },
+            { nome: 'NITROGÊNIO LASERLINE', tipo: 'cilindro' },
+            { nome: 'DIÓXIDO DE CARBONO LASERLINE', tipo: 'cilindro' },
+            { nome: 'LASERLINE', tipo: 'cilindro' },
         ];
 
-        for (let i = 0; i < gasTypes.length; i++) {
+        for (const gas of gasTypes) {
             await db.insert(tiposGas).values({
-                nome: gasTypes[i],
-                ordem: i + 1,
+                nome: gas.nome,
+                tipo: gas.tipo,
+                ordem: 0,
             }).onConflictDoNothing();
         }
 
         // 2. CAPACIDADES
         console.log('⚖️  Verificando capacidades...');
+        // Valores solicitados pelo cliente
         const capacidadesKg = [2, 2.5, 3.6, 4, 5, 6, 7, 9, 10, 18, 25, 28, 33, 45];
         const capacidadesM3 = [0.3, 0.6, 1, 1.5, 2.25, 3, 4, 6, 7.5, 8.5, 10];
 
@@ -81,12 +84,10 @@ async function seed() {
 
         // 3. UNIDADES DE MEDIDA
         console.log('📏 Verificando unidades de medida...');
+        // Apenas kg e m3 conforme solicitado
         const unidadesMedidaData = [
             { nome: 'Kg', sigla: 'kg' },
             { nome: 'm³', sigla: 'm³' },
-            { nome: 'm³ comprimido', sigla: 'm³ comp.' },
-            { nome: 'Unidade', sigla: 'un' },
-            { nome: 'Cilindro', sigla: 'cil' },
         ];
 
         for (let i = 0; i < unidadesMedidaData.length; i++) {

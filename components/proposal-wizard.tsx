@@ -16,8 +16,6 @@ import {
     Trash2,
     Plus,
     Copy,
-    FileText,
-    TestTube, // Cilindro (approx)
     Droplets, // Liquido
     CheckCircle2,
     AlertCircle
@@ -26,7 +24,7 @@ import {
 import { cn } from "@/lib/utils"
 
 // Types
-type GasType = { id: number; nome: string }
+type GasType = { id: number; nome: string; tipo: string }
 type Capacity = { id: number; tamanho: string }
 type UnitMeasure = { id: number; nome: string }
 type PaymentTerm = { id: number; descricao: string }
@@ -79,7 +77,7 @@ export function ProposalWizard({
         localEntrega: initialData?.clienteLocalEntrega || "",
     })
 
-    // Locação (Cilindro only)
+    // Locação (Cilindro e Liquido)
     const [locacao, setLocacao] = useState({
         enabled: initialData?.locacaoAtiva || false,
         quantidade: initialData?.locacaoQuantidade?.toString() || "",
@@ -102,30 +100,6 @@ export function ProposalWizard({
     const locacaoTotal = locacao.enabled
         ? (Number(locacao.quantidade) || 0) * (Number(locacao.valorUnitario) || 0)
         : 0
-
-    const itemsTotal = items.reduce((acc, item) => {
-        return acc + (Number(item.valorUnitario) || 0)
-    }, 0)
-
-    // Note: Items total calculation is weird because we don't have Quantity in items according to PRD
-    // PRD Says: "Valor unitário" per item. Usually proposal has Quantity * Unit Price.
-    // BUT PRD Table structure: Descrição | Capacidade | UM | Valor Unitário | Condição
-    // It doesn't explicitly have "Quantity" col in "Inclusão de Itens" section.
-    // HOWEVER, practically, a proposal usually implies quantity. 
-    // Wait, let's re-read PRD. "Tabela Dinâmica: Descrição, Capacidade, UM, Valor Unitário, Condição".
-    // Maybe it lists products with their unit prices? "Tabela de Preços"?
-    // "Gerar PDF... Tabela de itens".
-    // For now I will follow PRD strictly: No quantity field per item row. Just listing prices.
-    // So "Total da Proposta" might just be sum of unit prices? Or maybe it's just a Price List proposal?
-    // "Proposta comercial... Venda de gases". Usually it's a price list proposal.
-    // "Valor total (auto calculado)" ONLY appears in Locação.
-    // AND "Lista de Itens".
-    // I will assume it's a PRICE LIST proposal (Tabela de Preços), not a Sales Order.
-    // So "Subtotal Itens" might not make sense if it's just a price list.
-    // BUT PRD says "Valor total" in listing.
-    // I'll assume users might want to output 0 as total if it's just a price list, or sum if they want.
-    // Actually, PRD 6: "Inclusão de Itens... Valor Unitário".
-    // I'll stick to PRD cols.
 
     // ACTIONS
     const handleAddItem = () => {
@@ -169,8 +143,14 @@ export function ProposalWizard({
                     return setError("Selecione a capacidade para os itens de cilindro")
                 }
             }
-            if (type === "cilindro" && locacao.enabled && (!locacao.quantidade || !locacao.valorUnitario)) {
+            // Mandatory Rental Validation
+            if (locacao.enabled && (!locacao.quantidade || !locacao.valorUnitario)) {
                 return setError("Preencha os dados da locação")
+            }
+            // Liquid Mandatory Rental 
+            if (type === "liquido") {
+                if (!locacao.enabled) return setError("Para gases líquidos, a locação de tanque/telemetria é obrigatória.");
+                if (!locacao.quantidade || !locacao.valorUnitario) return setError("Preencha os valores de locação do tanque.");
             }
         }
 
@@ -223,8 +203,7 @@ export function ProposalWizard({
 
             // Redirect to list with success parameter
             const successMsg = initialData?.id ? 'Proposta atualizada com sucesso' : 'Proposta criada com sucesso';
-            // router.push(`/dashboard/propostas?success=true&msg=${encodeURIComponent(successMsg)}`)
-            router.push(`/dashboard/propostas`) // Simple redirect for now
+            router.push(`/dashboard/propostas`)
 
         } catch (err: any) {
             console.error(err)
@@ -346,16 +325,21 @@ export function ProposalWizard({
                     {step === 3 && (
                         <div className="space-y-8">
 
-                            {/* Locação (Cilindro Only) */}
-                            {type === "cilindro" && (
-                                <div className="p-4 border rounded-lg bg-slate-50 space-y-4">
+                            {/* Locação (Cilindro e Liquido) */}
+                            {(type === "cilindro" || type === "liquido") && (
+                                <div className={cn("p-4 border rounded-lg space-y-4", type === "liquido" ? "bg-cyan-50 border-cyan-200" : "bg-slate-50")}>
                                     <div className="flex items-center gap-2">
                                         <Checkbox
                                             id="locacao"
                                             checked={locacao.enabled}
                                             onCheckedChange={(c) => setLocacao(prev => ({ ...prev, enabled: c === true }))}
+                                            disabled={type === "liquido" && false} // Keep editable, validation handles enforcing
                                         />
-                                        <Label htmlFor="locacao" className="text-base font-semibold">Incluir Locação de Cilindros Mensal</Label>
+                                        <Label htmlFor="locacao" className="text-base font-semibold">
+                                            {type === 'liquido'
+                                                ? "Incluir Locação de Tanque/Telemetria (Obrigatório)"
+                                                : "Incluir Locação de Cilindros Mensal"}
+                                        </Label>
                                     </div>
 
                                     {locacao.enabled && (
@@ -426,9 +410,11 @@ export function ProposalWizard({
                                                                 <SelectValue placeholder="Selecione..." />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                {gasTypes.map(g => (
-                                                                    <SelectItem key={g.id} value={g.id.toString()}>{g.nome}</SelectItem>
-                                                                ))}
+                                                                {gasTypes
+                                                                    .filter(g => g.tipo === type) // Filter by type
+                                                                    .map(g => (
+                                                                        <SelectItem key={g.id} value={g.id.toString()}>{g.nome}</SelectItem>
+                                                                    ))}
                                                             </SelectContent>
                                                         </Select>
                                                     </TableCell>
@@ -514,11 +500,11 @@ export function ProposalWizard({
                                 <Button variant="outline" size="sm" onClick={() => setStep(2)}>Editar</Button>
                             </div>
 
-                            {type === 'cilindro' && locacao.enabled && (
+                            {locacao.enabled && (
                                 <div className="border p-4 rounded-lg">
-                                    <h4 className="font-medium mb-2">Locação Mensal</h4>
+                                    <h4 className="font-medium mb-2">{type === 'liquido' ? 'Locação Tanque' : 'Locação Cilindros'}</h4>
                                     <div className="flex justify-between text-sm">
-                                        <span>{locacao.quantidade} cilindros x {Number(locacao.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                        <span>{locacao.quantidade} {type === 'liquido' ? 'un' : 'cilindros'} x {Number(locacao.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                                         <span className="font-bold">{locacaoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                                     </div>
                                 </div>
