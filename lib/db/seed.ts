@@ -174,8 +174,19 @@ async function seed() {
                 email: adminEmail,
                 senha: adminPassword,
                 role: 'superadmin',
-                unidadeId: null, // Admin não tem unidade fixa
+                // Assign Joaçaba as default unit for Admin as requested
+                unidadeId: (await db.select().from(unidades).where(eq(unidades.nome, 'Joaçaba/SC')))[0]?.id || null,
             });
+        } else {
+            // Ensure existing admin also gets Joaçaba if null
+            if (!existingAdmin[0].unidadeId) {
+                const joacaba = (await db.select().from(unidades).where(eq(unidades.nome, 'Joaçaba/SC')))[0];
+                if (joacaba) {
+                    await db.update(users)
+                        .set({ unidadeId: joacaba.id })
+                        .where(eq(users.id, existingAdmin[0].id));
+                }
+            }
         }
 
         // Loops de unidades

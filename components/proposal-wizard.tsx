@@ -440,9 +440,11 @@ export function ProposalWizard({
                                                                 <SelectValue placeholder="UM" />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                {unitMeasures.map(u => (
-                                                                    <SelectItem key={u.id} value={u.id.toString()}>{u.nome}</SelectItem>
-                                                                ))}
+                                                                {unitMeasures
+                                                                    .filter(u => type === 'liquido' ? u.nome.toLowerCase() === 'kg' : true)
+                                                                    .map(u => (
+                                                                        <SelectItem key={u.id} value={u.id.toString()}>{u.nome}</SelectItem>
+                                                                    ))}
                                                             </SelectContent>
                                                         </Select>
                                                     </TableCell>
