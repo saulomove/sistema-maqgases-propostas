@@ -441,7 +441,15 @@ export function ProposalWizard({
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 {unitMeasures
-                                                                    .filter(u => type === 'liquido' ? u.nome.toLowerCase() === 'kg' : true)
+                                                                    .filter(u => {
+                                                                        if (type === 'liquido') {
+                                                                            // STRICT: Only allow 'Kg' for Liquid
+                                                                            return u.nome.trim().toLowerCase() === 'kg';
+                                                                        }
+                                                                        // For Cylinder, allow everything EXCEPT what? Actually allow all for now as user requested
+                                                                        // "somente na tela do liquido de cilindros se mantem todos" -> Cylinder keeps all
+                                                                        return true;
+                                                                    })
                                                                     .map(u => (
                                                                         <SelectItem key={u.id} value={u.id.toString()}>{u.nome}</SelectItem>
                                                                     ))}

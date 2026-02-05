@@ -19,8 +19,8 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
         height: 60,
-        borderBottomWidth: 1.5, // Refined
-        borderBottomColor: '#0B9BD9', // Brand Primary
+        borderBottomWidth: 1.5,
+        borderBottomColor: '#00A8E8', // Brand Light Blue
         paddingBottom: 10,
     },
     logo: {
@@ -31,14 +31,14 @@ export const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     title: {
-        fontSize: 14, // Slightly smaller per design
+        fontSize: 14,
         fontWeight: 'bold',
-        color: '#0B9BD9',
+        color: '#003366', // Brand Dark Blue
         textTransform: 'uppercase',
     },
     subtitle: {
         fontSize: 9,
-        color: '#888888',
+        color: '#00A8E8', // Brand Light Blue
         textTransform: 'uppercase',
         marginTop: 2,
     },
@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#0B9BD9',
+        color: '#003366', // Brand Dark Blue
         marginBottom: 8,
     },
     text: {

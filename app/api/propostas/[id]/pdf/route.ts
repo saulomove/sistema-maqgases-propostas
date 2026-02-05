@@ -58,8 +58,11 @@ export async function GET(
 
         // Preload Images
         const logoSrc = getImageBase64('logo.png');
-        const heroGeneralSrc = getImageBase64('images/hero-general.png');
-        const heroLiquidSrc = getImageBase64('images/hero-liquid.png');
+        const heroLiquidSrc = getImageBase64('images/hero_liquid.jpg');
+        const heroCylinderSrc = getImageBase64('images/hero_cylinder.jpg');
+
+        // Determine correct Hero Image based on Proposal Type
+        const heroImageSrc = proposal.tipo === 'liquido' ? heroLiquidSrc : heroCylinderSrc;
 
         // Reconstruct Data for PDF
         // We saved a snapshot! Use it if available to ensure immutability.
@@ -106,8 +109,7 @@ export async function GET(
                 },
                 images: {
                     logo: logoSrc,
-                    heroGeneral: heroGeneralSrc,
-                    heroLiquid: heroLiquidSrc
+                    hero: heroImageSrc, // Pass the selected image
                 }
             };
         } else {
