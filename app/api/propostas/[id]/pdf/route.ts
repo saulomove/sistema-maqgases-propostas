@@ -58,6 +58,7 @@ export async function GET(
 
         // Preload Images
         const logoSrc = getImageBase64('logo.png');
+        const logoWhiteSrc = getImageBase64('logo_white.png'); // Load white logo for dark backgrounds
         const heroLiquidSrc = getImageBase64('images/hero_liquid.jpg');
         const heroCylinderSrc = getImageBase64('images/hero_cylinder.jpg');
 
@@ -109,6 +110,7 @@ export async function GET(
                 },
                 images: {
                     logo: logoSrc,
+                    logoWhite: logoWhiteSrc, // Pass white logo
                     hero: heroImageSrc, // Pass the selected image
                 }
             };

@@ -1,8 +1,6 @@
 import React from 'react';
-import { Page, Text, View, Image, Document } from '@react-pdf/renderer';
+import { Page, Text, View, Image } from '@react-pdf/renderer';
 import { styles } from '../styles';
-import { SegmentCard } from '../components/SegmentCard';
-import { ICONS } from '../icons';
 
 interface LiquidTemplateProps {
     proposalNumber: string;
@@ -12,6 +10,7 @@ interface LiquidTemplateProps {
     unitPhone: string;
     unitEmail: string;
     logoSrc?: string | null;
+    logoWhiteSrc?: string | null; // Use white logo
     heroSrc?: string | null;
 }
 
@@ -23,95 +22,227 @@ export const LiquidTemplatePage1 = ({
     unitPhone,
     unitEmail,
     logoSrc,
+    logoWhiteSrc, // Receive prop
     heroSrc
 }: LiquidTemplateProps) => (
-    <Page size="A4" style={styles.page}>
-        {/* HEADER */}
-        <View style={styles.header}>
-            <View>
-                {logoSrc ? (
-                    <Image src={logoSrc} style={styles.logo} />
-                ) : (
-                    <View style={{ ...styles.logo, backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 8 }}>Logo Missing</Text>
-                    </View>
-                )}
+    <Page size="A4" style={{ margin: 0, padding: 0, fontFamily: 'Inter' }}>
+        {/* HERO SECTION - FULL PAGE DRAMATIC */}
+        <View style={{
+            position: 'relative',
+            height: 340, // Reduced from 420 to prevent overflow
+            backgroundColor: '#052030', // Darker blue base
+        }}>
+            {/* Background Image with Overlay */}
+            {heroSrc && (
+                <>
+                    <Image
+                        src={heroSrc}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            objectFit: 'cover',
+                            opacity: 0.30  // Increased from 0.18 - more visible
+                        }}
+                    />
+                    {/* Darker overlay */}
+                    <View style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(5, 32, 48, 0.85)'  // Darker opacity for premium look
+                    }} />
+                </>
+            )}
+
+            {/* Logo top left - Prefer White */}
+            <View style={{ position: 'absolute', top: 30, left: 40 }}>
+                {logoWhiteSrc || logoSrc ? (
+                    <Image
+                        src={logoWhiteSrc || logoSrc || ""}
+                        style={{ width: 140, objectFit: 'contain' }}
+                    />
+                ) : null}
             </View>
-            <View style={styles.headerRight}>
-                <Text style={styles.title}>PROPOSTA COMERCIAL</Text>
-                <Text style={styles.subtitle}>GASES LÍQUIDOS</Text>
-                <View style={styles.proposalInfo}>
-                    <Text style={styles.labelValue}>Nº: {proposalNumber}</Text>
-                    <Text style={styles.labelValue}>Data: {date}</Text>
+
+            {/* Proposal info top right */}
+            <View style={{ position: 'absolute', top: 35, right: 40 }}>
+                <Text style={{ fontSize: 9, color: '#FFFFFF', opacity: 0.9, marginBottom: 2 }}>
+                    Nº {proposalNumber}
+                </Text>
+                <Text style={{ fontSize: 9, color: '#FFFFFF', opacity: 0.9 }}>
+                    {date}
+                </Text>
+            </View>
+
+            {/* Main Hero Content */}
+            <View style={{
+                position: 'absolute',
+                top: '45%',
+                left: 40,
+                right: 40,
+                transform: 'translateY(-50%)'
+            }}>
+                <Text style={{
+                    fontSize: 42, // Reduced from 52
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                    marginBottom: 20,
+                    letterSpacing: -1.5
+                }}>
+                    SOLUÇÕES{'\n'}COMPLETAS EM{'\n'}CO₂ LÍQUIDO
+                </Text>
+                <View style={{
+                    width: 140,
+                    height: 6,
+                    backgroundColor: '#FFFFFF',
+                    marginBottom: 25,
+                    borderRadius: 3
+                }} />
+                <Text style={{
+                    fontSize: 13, // Reduced from 16
+                    fontWeight: 'bold',
+                    color: '#FFFFFF',
+                    lineHeight: 1.5,
+                    maxWidth: 450
+                }}>
+                    Fornecimento garantido o ano todo com logística própria,{'\n'}qualidade certificada e suporte técnico especializado
+                </Text>
+            </View>
+
+            {/* Overlay text REMOVED */}
+        </View>
+
+        {/* SECTION: DIFERENCIAIS - WHITE WITH COLORED BOXES */}
+        <View style={{
+            backgroundColor: '#FFFFFF',
+            paddingHorizontal: 40,
+            paddingVertical: 30, // Reduced from 50/45 to prevent overflow
+            paddingBottom: 60, // Ensure footer clearance
+        }}>
+            <Text style={{
+                fontSize: 32,
+                fontWeight: 900,
+                color: '#1A1D29',
+                marginBottom: 12,
+                letterSpacing: -0.8,
+                textAlign: 'center'
+            }}>
+                Nossos Diferenciais
+            </Text>
+            <Text style={{
+                fontSize: 13,
+                color: '#6B7280',
+                textAlign: 'center',
+                marginBottom: 30,
+                maxWidth: 480,
+                marginHorizontal: 'auto'
+            }}>
+                Excelência e confiabilidade em cada etapa do fornecimento
+            </Text>
+
+            {/* Grid 2x2 de diferenciais */}
+            <View style={{ flexDirection: 'row', gap: 15, marginBottom: 15 }}>
+                <View style={{
+                    flex: 1,
+                    backgroundColor: '#EFF6FF',
+                    padding: 22,
+                    borderRadius: 10,
+                    borderLeftWidth: 5,
+                    borderLeftColor: '#00A0E3'
+                }}>
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#00A0E3', marginBottom: 8 }}>
+                        ✓ Certificação de Qualidade
+                    </Text>
+                    <Text style={{ fontSize: 10, color: '#374151', lineHeight: 1.5 }}>
+                        Gás carbônico com controle rigoroso e pureza certificada
+                    </Text>
+                </View>
+                <View style={{
+                    flex: 1,
+                    backgroundColor: '#EFF6FF',
+                    padding: 22,
+                    borderRadius: 10,
+                    borderLeftWidth: 5,
+                    borderLeftColor: '#00A0E3'
+                }}>
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#00A0E3', marginBottom: 8 }}>
+                        ✓ Logística Própria
+                    </Text>
+                    <Text style={{ fontSize: 10, color: '#374151', lineHeight: 1.5 }}>
+                        Frota moderna com rastreabilidade e pontualidade
+                    </Text>
+                </View>
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 15 }}>
+                <View style={{
+                    flex: 1,
+                    backgroundColor: '#EFF6FF',
+                    padding: 22,
+                    borderRadius: 10,
+                    borderLeftWidth: 5,
+                    borderLeftColor: '#00A0E3'
+                }}>
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#00A0E3', marginBottom: 8 }}>
+                        ✓ Disponibilidade Total
+                    </Text>
+                    <Text style={{ fontSize: 10, color: '#374151', lineHeight: 1.5 }}>
+                        Fornecimento contínuo sem riscos de desabastecimento
+                    </Text>
+                </View>
+                <View style={{
+                    flex: 1,
+                    backgroundColor: '#EFF6FF',
+                    padding: 22,
+                    borderRadius: 10,
+                    borderLeftWidth: 5,
+                    borderLeftColor: '#00A0E3'
+                }}>
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#00A0E3', marginBottom: 8 }}>
+                        ✓ Suporte Especializado
+                    </Text>
+                    <Text style={{ fontSize: 10, color: '#374151', lineHeight: 1.5 }}>
+                        Equipe técnica pronta para atender suas necessidades
+                    </Text>
                 </View>
             </View>
         </View>
 
-        {/* INSTITUCIONAL */}
-        <View style={styles.institutionalContainer}>
-            <View style={styles.column}>
-                <Text style={styles.sectionTitle}>Desde 2009, entregando confiança, agilidade e suporte em gases</Text>
-                <Text style={styles.text}>
-                    A MaqGases é referência no fornecimento de gases industriais, medicinais e especiais,
-                    atendendo empresas e instituições em todo o Sul do Brasil.
-                </Text>
-                <Text style={styles.text}>
-                    Atuamos com logística própria, rigorosos padrões de qualidade e suporte técnico especializado,
-                    oferecendo soluções seguras e eficientes para cada aplicação.
-                </Text>
-            </View>
-            <View style={styles.column}>
-                <Text style={styles.sectionTitle}>Muito além do fornecimento</Text>
-                <Text style={styles.text}>• Frota própria e controle logístico</Text>
-                <Text style={styles.text}>• Gases de alta pureza e rastreabilidade</Text>
-                <Text style={styles.text}>• Entregas programadas ou emergenciais</Text>
-                <Text style={styles.text}>• Suporte técnico especializado</Text>
-                <Text style={styles.text}>• Atendimento personalizado por segmento</Text>
-            </View>
-        </View>
-
-        {/* BANNER SEGMENTOS */}
-        <View style={{ marginBottom: 20 }}>
-            <Text style={{ ...styles.sectionTitle, marginBottom: 8 }}>Especialistas em Criogenia e Grandes Volumes</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
-                <SegmentCard
-                    title="Saúde / Healthcare"
-                    description="Gases medicinais para hospitais e clínicas com total confiabilidade."
-                    iconPath={ICONS.HEALTH}
-                />
-                <SegmentCard
-                    title="Engenharia e Projetos"
-                    description="Desenvolvimento de plantas e instalações industriais."
-                    iconPath={ICONS.FACTORY}
-                />
-            </View>
-        </View>
-
-        {/* HERO IMAGE */}
-        <View>
-            {heroSrc ? (
-                <Image
-                    src={heroSrc}
-                    style={{ width: '100%', height: 250, borderRadius: 6, objectFit: 'cover' }}
-                />
-            ) : null}
-            {/* Overlay Text embedded in image or separate view? Keeping it clean with just image as requested/implied by "Visão Tanques" */}
-            <View style={{ position: 'absolute', bottom: 15, left: 15, backgroundColor: 'rgba(11, 155, 217, 0.9)', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 4 }}>
-                <Text style={{ fontSize: 10, color: 'white', fontWeight: 'bold' }}>
-                    +8 mil empresas atendidas no Sul do Brasil
-                </Text>
-            </View>
-        </View>
+        {/* SECTION: CTA - REMOVED FOR 2-PAGE LIMIT */}
 
         {/* FOOTER */}
-        <View style={styles.footer}>
+        <View style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#1A1D29',
+            paddingHorizontal: 40,
+            paddingVertical: 18,
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+        }}>
             <View>
-                <Text style={styles.footerText}>{unitName}</Text>
-                <Text style={styles.footerText}>{unitAddress}</Text>
+                <Text style={{ fontSize: 9, color: '#FFFFFF', fontWeight: 'bold', marginBottom: 3 }}>
+                    {unitName}
+                </Text>
+                <Text style={{ fontSize: 8, color: '#9CA3AF' }}>
+                    {unitAddress}
+                </Text>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-                <Text style={styles.footerText}>{unitPhone} | {unitEmail}</Text>
-                <Text style={styles.footerText}>www.maqgases.com.br</Text>
+                <Text style={{ fontSize: 8, color: '#9CA3AF', marginBottom: 3 }}>
+                    {unitPhone} | {unitEmail}
+                </Text>
+                <Text style={{ fontSize: 9, color: '#00A0E3', fontWeight: 'bold' }}>
+                    www.maqgases.com.br
+                </Text>
             </View>
         </View>
     </Page>

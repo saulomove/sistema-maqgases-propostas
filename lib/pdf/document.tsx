@@ -29,6 +29,7 @@ interface ProposalData {
     };
     images?: {
         logo: string | null;
+        logoWhite?: string | null; // Optional
         hero: string | null;
     };
 }
@@ -46,6 +47,7 @@ export const ProposalDocument = ({ data }: { data: ProposalData }) => {
                     unitPhone={data.unit.telefone}
                     unitEmail={data.unit.email}
                     logoSrc={data.images?.logo}
+                    logoWhiteSrc={data.images?.logoWhite} // Pass white logo
                     heroSrc={data.images?.hero}
                 />
             ) : (
@@ -57,6 +59,7 @@ export const ProposalDocument = ({ data }: { data: ProposalData }) => {
                     unitPhone={data.unit.telefone}
                     unitEmail={data.unit.email}
                     logoSrc={data.images?.logo}
+                    logoWhiteSrc={data.images?.logoWhite} // Pass white logo
                     heroSrc={data.images?.hero}
                 />
             )}

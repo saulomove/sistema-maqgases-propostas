@@ -51,7 +51,40 @@ export const DataPage = ({
                 />
                 <Text style={{ fontSize: 9, color: '#666' }}>{proposalNumber}</Text>
             </View>
-            <View style={{ height: 1, backgroundColor: '#0B9BD9', marginBottom: 20 }} />
+            <View style={styles.sectionHeaderLine} />
+
+            {/* SECTION: WHY MAQGASES - DARK (Moved to Top of Page 2) */}
+            <View style={{
+                backgroundColor: '#1A1D29',
+                padding: 20,
+                marginBottom: 30, // Increased margin for separation
+                borderRadius: 6
+            }}>
+                <Text style={{
+                    fontSize: 16,
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    marginBottom: 8,
+                    letterSpacing: -0.5
+                }}>
+                    Por que escolher a MaqGases?
+                </Text>
+                <Text style={{
+                    fontSize: 10,
+                    color: '#E5E7EB',
+                    lineHeight: 1.5,
+                    marginBottom: 6
+                }}>
+                    Atendemos empresas de todos os portes com soluções em gases <Text style={{ fontWeight: 'bold', color: '#00A0E3' }}>padronizadas, seguras e rastreáveis</Text>, garantindo <Text style={{ fontWeight: 'bold' }}>eficiência operacional</Text>.
+                </Text>
+                <Text style={{
+                    fontSize: 10,
+                    color: '#E5E7EB',
+                    lineHeight: 1.5
+                }}>
+                    Nossa expertise oferece <Text style={{ fontWeight: 'bold', color: '#00A0E3' }}>flexibilidade total</Text>, com frota própria e suporte técnico especializado.
+                </Text>
+            </View>
 
             {/* SPLIT INFO SECTION */}
             <View style={{ flexDirection: 'row', marginBottom: 30 }}>
@@ -74,6 +107,9 @@ export const DataPage = ({
                     <View>
                         <Text style={{ fontSize: 9, color: '#111827' }}>Vendedor: {sellerName}</Text>
                     </View>
+                    <View>
+                        <Text style={{ fontSize: 9, color: '#111827' }}>Data: {date}</Text>
+                    </View>
                 </View>
             </View>
 
@@ -88,7 +124,10 @@ export const DataPage = ({
                 </View>
 
                 {items.map((item, i) => (
-                    <View key={i} style={styles.tableRow}>
+                    <View key={i} style={{
+                        ...styles.tableRow,
+                        backgroundColor: i % 2 === 0 ? '#FFFFFF' : '#F7FAFC' // Zebra striping
+                    }}>
                         <Text style={{ ...styles.tableCell, flex: 2.5 }}>{item.tipoGasNome}</Text>
                         <Text style={{ ...styles.tableCell, flex: 0.8 }}>{item.capacidadeTexto || '-'}</Text>
                         <Text style={{ ...styles.tableCell, flex: 0.8 }}>{item.unidadeMedidaNome}</Text>
