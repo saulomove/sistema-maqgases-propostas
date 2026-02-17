@@ -84,6 +84,9 @@ export async function GET(
             // I will use the `propostaItens` table which DOES have names saved!
             const items = await db.select().from(propostaItens).where(eq(propostaItens.propostaId, proposal.id));
 
+            // Custom override for Gabriel (admin@)
+            const contactEmail = seller.email === 'admin@maqgases.com.br' ? 'gabriel@maqgases.com.br' : (unit.email || '');
+
             // Construct the data object expected by ProposalDocument
             pdfData = {
                 id: proposal.id,
@@ -104,7 +107,7 @@ export async function GET(
                     nome: unit.nome,
                     endereco: unit.endereco || '',
                     telefone: unit.telefone || '',
-                    email: unit.email || ''
+                    email: contactEmail
                 },
                 seller: {
                     nome: seller.nome
