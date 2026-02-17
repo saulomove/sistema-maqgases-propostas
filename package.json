@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx lib/db/seed.ts"
+    "db:seed": "tsx lib/db/seed.ts",
+    "db:cleanup": "tsx scripts/cleanup-users.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

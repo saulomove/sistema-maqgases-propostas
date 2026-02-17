@@ -10,6 +10,7 @@ export default async function AdminUsuariosPage() {
     // Fetch users with their unit info
     const usersList = await db.select({
         id: users.id,
+        nome: users.nome,
         email: users.email,
         role: users.role,
         unidadeId: users.unidadeId,

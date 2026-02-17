@@ -24,6 +24,7 @@ export function UsersTable({ initialData, units }: { initialData: any[], units: 
         <Table>
             <TableHeader>
                 <TableRow>
+                    <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Função</TableHead>
                     <TableHead>Unidade Vinculada</TableHead>
@@ -33,7 +34,8 @@ export function UsersTable({ initialData, units }: { initialData: any[], units: 
             <TableBody>
                 {initialData.map((user) => (
                     <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.email}</TableCell>
+                        <TableCell className="font-medium">{user.nome}</TableCell>
+                        <TableCell>{user.email}</TableCell>
                         <TableCell>
                             <Badge variant={user.role === 'superadmin' ? 'default' : 'secondary'}>
                                 {user.role}

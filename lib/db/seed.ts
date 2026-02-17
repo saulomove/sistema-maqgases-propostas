@@ -121,8 +121,8 @@ async function seed() {
                 endereco: 'Rua Armindo Raimundo Heberle, 415, Vila Remor - CEP 89600-000',
                 cidade: 'Joaçaba',
                 uf: 'SC',
-                email: 'joacaba@maqgases.com.br',
-                senhaUser: 'joacaba123'
+                email: 'joacaba@maqgases.com.br', // Generic unit email (keep for reference if needed, but users are specific now)
+                site: 'www.maqgases.com.br'
             },
             {
                 nome: 'Palhoça/SC',
@@ -131,7 +131,7 @@ async function seed() {
                 cidade: 'Palhoça',
                 uf: 'SC',
                 email: 'palhoca@maqgases.com.br',
-                senhaUser: 'palhoca123'
+                site: 'www.maqgases.com.br'
             },
             {
                 nome: 'Caxias do Sul/RS',
@@ -140,16 +140,16 @@ async function seed() {
                 cidade: 'Caxias do Sul',
                 uf: 'RS',
                 email: 'caxias@maqgases.com.br',
-                senhaUser: 'caxias123'
+                site: 'www.maqgases.com.br'
             },
             {
                 nome: 'Chapecó/SC',
                 razaoSocial: 'MaqGases Filial Chapecó',
-                endereco: 'Rua Cuba, 221 - QD 2014 Lote 01, Líder - CEP 89805-225',
+                endereco: 'Rua Cuba, S/N QD 2014 Lote 01, Líder - CEP 89805-225',
                 cidade: 'Chapecó',
                 uf: 'SC',
                 email: 'chapeco@maqgases.com.br',
-                senhaUser: 'chapeco123'
+                site: 'www.maqgases.com.br'
             },
             {
                 nome: 'Mafra/SC',
@@ -158,51 +158,22 @@ async function seed() {
                 cidade: 'Mafra',
                 uf: 'SC',
                 email: 'mafra@maqgases.com.br',
-                senhaUser: 'mafra123'
+                site: 'www.maqgases.com.br'
             }
         ];
 
-        // 6. GARANTIR SUPERADMIN
-        console.log('👤 Verificando SuperAdmin...');
-        const adminEmail = 'admin@maqgases.com.br';
-        const existingAdmin = await db.select().from(users).where(eq(users.email, adminEmail));
-        const adminPassword = await bcrypt.hash('senha123', 10);
-
-        if (existingAdmin.length === 0) {
-            await db.insert(users).values({
-                nome: 'Admin MaqGases',
-                email: adminEmail,
-                senha: adminPassword,
-                role: 'superadmin',
-                // Assign Joaçaba as default unit for Admin as requested
-                unidadeId: (await db.select().from(unidades).where(eq(unidades.nome, 'Joaçaba/SC')))[0]?.id || null,
-            });
-        } else {
-            // Ensure existing admin also gets Joaçaba if null
-            if (!existingAdmin[0].unidadeId) {
-                const joacaba = (await db.select().from(unidades).where(eq(unidades.nome, 'Joaçaba/SC')))[0];
-                if (joacaba) {
-                    await db.update(users)
-                        .set({ unidadeId: joacaba.id })
-                        .where(eq(users.id, existingAdmin[0].id));
-                }
-            }
-        }
-
-        // Loops de unidades
-        const senhaHashUsers = await bcrypt.hash('senha123', 10); // Default hash
-
+        // Ensure Units Exist First
+        const unidadeMap = new Map();
         for (const unitData of unidadesReais) {
             // Verificar se unidade já existe pelo nome
             const existingUnit = await db.select().from(unidades).where(eq(unidades.nome, unitData.nome));
-
             let unidadeId;
 
             if (existingUnit.length > 0) {
                 console.log(`Unidade ${unitData.nome} já existe. Atualizando...`);
                 await db.update(unidades).set({
                     endereco: unitData.endereco,
-                    email: unitData.email
+                    // email: unitData.email // Don't overwrite email if it was changed manually, or keep it synced? Let's sync address mainly.
                 }).where(eq(unidades.id, existingUnit[0].id));
                 unidadeId = existingUnit[0].id;
             } else {
@@ -211,32 +182,56 @@ async function seed() {
                     nome: unitData.nome,
                     razaoSocial: unitData.razaoSocial,
                     endereco: unitData.endereco,
-                    email: unitData.email,
+                    email: unitData.email, // Default generic email for the UNIT contact info
                     telefone: '(00) 0000-0000',
-                    site: 'www.maqgases.com.br'
+                    site: unitData.site
                 }).returning();
                 unidadeId = newUnit.id;
             }
+            unidadeMap.set(unitData.nome, unidadeId);
+        }
 
-            // Criar ou atualizar usuário da unidade
-            const existingUser = await db.select().from(users).where(eq(users.email, unitData.email));
-            const userPassword = await bcrypt.hash(unitData.senhaUser, 10);
+        // 6. USUÁRIOS ESPECÍFICOS
+        console.log('👤 Verificando Usuários Específicos...');
+
+        const usuariosEspecificos = [
+            { nome: 'Marcelo Perinotti', email: 'vendaschapeco@maqgases.com.br', unidadeNome: 'Chapecó/SC', role: 'unidade' },
+            { nome: 'Rosangela Tchorney', email: 'rosangela@maqgases.com.br', unidadeNome: 'Mafra/SC', role: 'unidade' },
+            { nome: 'Ivan Cesar Ratti', email: 'ivan@maqgases.com.br', unidadeNome: 'Palhoça/SC', role: 'unidade' },
+            { nome: 'Edgar Junior Nicolini', email: 'vendascaxiasdosul@maqgases.com.br', unidadeNome: 'Caxias do Sul/RS', role: 'unidade' },
+            { nome: 'Maxwel Aguiar', email: 'vendas@maqgases.com.br', unidadeNome: 'Joaçaba/SC', role: 'unidade' },
+            { nome: 'Mauricio Ranckel', email: 'financeiro@maqgases.com.br', unidadeNome: 'Joaçaba/SC', role: 'unidade' }, // Financeiro com acesso de unidade? Ou admin? Pedido como usuário da lista.
+            { nome: 'Gabriel Bucco Parolin', email: 'admin@maqgases.com.br', unidadeNome: 'Joaçaba/SC', role: 'superadmin' }
+        ];
+
+        const defaultPassword = 'senha123'; // Could use specific passwords if provided, but default for now
+        const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+        for (const u of usuariosEspecificos) {
+            const unidadeId = unidadeMap.get(u.unidadeNome);
+            if (!unidadeId) {
+                console.error(`❌ Unidade ${u.unidadeNome} não encontrada para usuário ${u.email}`);
+                continue;
+            }
+
+            const existingUser = await db.select().from(users).where(eq(users.email, u.email));
 
             if (existingUser.length === 0) {
-                console.log(`Criando usuário ${unitData.email}...`);
+                console.log(`Criando usuário ${u.nome} (${u.email})...`);
                 await db.insert(users).values({
-                    nome: `Comercial ${unitData.cidade}`,
-                    email: unitData.email,
-                    senha: userPassword,
-                    role: 'unidade',
+                    nome: u.nome,
+                    email: u.email,
+                    senha: hashedPassword,
+                    role: u.role as 'superadmin' | 'unidade',
                     unidadeId: unidadeId
                 });
             } else {
-                console.log(`Usuário ${unitData.email} já existe. Atualizando senha/vínculo...`);
+                console.log(`Usuário ${u.email} já existe. Atualizando dados...`);
                 await db.update(users).set({
-                    senha: userPassword,
+                    nome: u.nome,
+                    role: u.role as 'superadmin' | 'unidade',
                     unidadeId: unidadeId,
-                    role: 'unidade'
+                    // senha: hashedPassword // Optional: reset password on seed? Maybe better not to lock them out if they changed it.
                 }).where(eq(users.id, existingUser[0].id));
             }
         }
