@@ -157,13 +157,7 @@ export const DataPage = ({
                 </View>
             )}
 
-            {/* FRETE SECTION (Optional Display if > 0) */}
-            {freteValor > 0 && (
-                <View style={{ marginBottom: 20, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
-                    <Text style={{ fontSize: 10, color: '#374151', fontWeight: 'bold' }}>FRETE:</Text>
-                    <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#111827' }}>R$ {freteValor.toFixed(2)}</Text>
-                </View>
-            )}
+
 
 
 
