@@ -81,7 +81,20 @@ export async function POST(request: NextRequest) {
                 if (!item.tipoGasId) continue;
 
                 const gasNome = await getGasName(Number(item.tipoGasId));
-                const capTexto = item.capacidadeId ? await getCapText(Number(item.capacidadeId)) : null;
+                let capTexto = null;
+                let capId = null;
+
+                // Handle Multiple Capacities
+                if (item.capacidadeIds && Array.isArray(item.capacidadeIds) && item.capacidadeIds.length > 0) {
+                    const names = await Promise.all(item.capacidadeIds.map((id: string) => getCapText(Number(id))));
+                    capTexto = names.filter(Boolean).join(", ");
+                    capId = Number(item.capacidadeIds[0]); // Use first as primary reference
+                } else if (item.capacidadeId) {
+                    // Legacy/Single support
+                    capTexto = await getCapText(Number(item.capacidadeId));
+                    capId = Number(item.capacidadeId);
+                }
+
                 const umNome = await getUMName(Number(item.unidadeMedidaId));
                 const payDesc = await getPayDesc(Number(item.condicaoPagamentoId));
                 const valUnit = Number(item.valorUnitario || 0);
@@ -90,7 +103,7 @@ export async function POST(request: NextRequest) {
                     propostaId: newProposal.id,
                     tipoGasId: Number(item.tipoGasId),
                     tipoGasNome: gasNome,
-                    capacidadeId: item.capacidadeId ? Number(item.capacidadeId) : null,
+                    capacidadeId: capId,
                     capacidadeTexto: capTexto,
                     unidadeMedidaId: Number(item.unidadeMedidaId),
                     unidadeMedidaNome: umNome,

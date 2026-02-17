@@ -18,8 +18,18 @@ import {
     Copy,
     Droplets, // Liquido
     CheckCircle2,
-    AlertCircle
+    AlertCircle,
+    ChevronDown
 } from "lucide-react"
+
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuCheckboxItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 
 import { cn } from "@/lib/utils"
 
@@ -51,7 +61,8 @@ interface ProposalWizardProps {
 type ProposalItem = {
     id: string // temporary frontend ID
     tipoGasId: string
-    capacidadeId: string // only for cylinder
+    capacidadeId: string // legacy, keep for Type compat
+    capacidadeIds: string[] // NEW: Multi-select support
     unidadeMedidaId: string
     valorUnitario: string
     condicaoPagamentoId: string
@@ -90,6 +101,7 @@ export function ProposalWizard({
             id: crypto.randomUUID(),
             tipoGasId: item.tipoGasId.toString(),
             capacidadeId: item.capacidadeId?.toString() || "",
+            capacidadeIds: item.capacidadeId ? [item.capacidadeId.toString()] : [], // Init from legacy
             unidadeMedidaId: item.unidadeMedidaId.toString(),
             valorUnitario: item.valorUnitario.toString(),
             condicaoPagamentoId: item.condicaoPagamentoId.toString()
@@ -109,6 +121,7 @@ export function ProposalWizard({
                 id: crypto.randomUUID(),
                 tipoGasId: "",
                 capacidadeId: "",
+                capacidadeIds: [],
                 unidadeMedidaId: "",
                 valorUnitario: "",
                 condicaoPagamentoId: ""
@@ -124,8 +137,21 @@ export function ProposalWizard({
         setItems([...items, { ...item, id: crypto.randomUUID() }])
     }
 
-    const handleUpdateItem = (id: string, field: keyof ProposalItem, value: string) => {
+    const handleUpdateItem = (id: string, field: keyof ProposalItem, value: any) => {
         setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item))
+    }
+
+    const handleToggleCapacity = (itemId: string, capId: string) => {
+        setItems(items.map(item => {
+            if (item.id !== itemId) return item;
+
+            const currentIds = item.capacidadeIds || [];
+            const newIds = currentIds.includes(capId)
+                ? currentIds.filter(id => id !== capId)
+                : [...currentIds, capId];
+
+            return { ...item, capacidadeIds: newIds };
+        }));
     }
 
     // NAVIGATION
@@ -139,8 +165,8 @@ export function ProposalWizard({
                 if (!item.tipoGasId || !item.unidadeMedidaId || !item.valorUnitario || !item.condicaoPagamentoId) {
                     return setError("Preencha todos os campos obrigatórios dos itens")
                 }
-                if (type === "cilindro" && !item.capacidadeId) {
-                    return setError("Selecione a capacidade para os itens de cilindro")
+                if (type === "cilindro" && (!item.capacidadeIds || item.capacidadeIds.length === 0)) {
+                    return setError("Selecione pelo menos uma capacidade para os itens de cilindro")
                 }
             }
             // Mandatory Rental Validation
@@ -175,7 +201,8 @@ export function ProposalWizard({
                 locacaoValorTotal: locacaoTotal,
                 itens: items.map(item => ({
                     tipoGasId: Number(item.tipoGasId),
-                    capacidadeId: item.capacidadeId ? Number(item.capacidadeId) : null,
+                    capacidadeId: item.capacidadeIds.length > 0 ? Number(item.capacidadeIds[0]) : null, // Primary Ref
+                    capacidadeIds: item.capacidadeIds, // Send the list
                     unidadeMedidaId: Number(item.unidadeMedidaId),
                     valorUnitario: Number(item.valorUnitario),
                     condicaoPagamentoId: Number(item.condicaoPagamentoId)
@@ -421,16 +448,29 @@ export function ProposalWizard({
 
                                                     {type === "cilindro" && (
                                                         <TableCell>
-                                                            <Select value={item.capacidadeId} onValueChange={(v) => handleUpdateItem(item.id, 'capacidadeId', v)}>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Cap." />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    {capacities.map(c => (
-                                                                        <SelectItem key={c.id} value={c.id.toString()}>{c.tamanho}</SelectItem>
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <Button variant="outline" size="sm" className="w-full justify-between font-normal">
+                                                                        {item.capacidadeIds?.length > 0
+                                                                            ? `${item.capacidadeIds.length} selecionado(s)`
+                                                                            : "Selecione"}
+                                                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent className="w-56" align="start">
+                                                                    <DropdownMenuLabel>Capacidades</DropdownMenuLabel>
+                                                                    <DropdownMenuSeparator />
+                                                                    {capacities.map((c) => (
+                                                                        <DropdownMenuCheckboxItem
+                                                                            key={c.id}
+                                                                            checked={item.capacidadeIds?.includes(c.id.toString())}
+                                                                            onCheckedChange={() => handleToggleCapacity(item.id, c.id.toString())}
+                                                                        >
+                                                                            {c.tamanho}
+                                                                        </DropdownMenuCheckboxItem>
                                                                     ))}
-                                                                </SelectContent>
-                                                            </Select>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
                                                         </TableCell>
                                                     )}
 
@@ -531,7 +571,8 @@ export function ProposalWizard({
                                     <TableBody>
                                         {items.map((item, i) => {
                                             const gas = gasTypes.find(g => g.id.toString() === item.tipoGasId);
-                                            const cap = capacities.find(c => c.id.toString() === item.capacidadeId);
+                                            // Multi-select display
+                                            const selectedCaps = item.capacidadeIds?.map(id => capacities.find(c => c.id.toString() === id)?.tamanho).filter(Boolean).join(", ");
                                             const um = unitMeasures.find(u => u.id.toString() === item.unidadeMedidaId);
                                             const pagto = paymentTerms.find(p => p.id.toString() === item.condicaoPagamentoId);
 
@@ -539,7 +580,7 @@ export function ProposalWizard({
                                                 <TableRow key={item.id}>
                                                     <TableCell>
                                                         {gas?.nome}
-                                                        {type === 'cilindro' && cap && <span className="text-muted-foreground ml-1">({cap.tamanho})</span>}
+                                                        {type === 'cilindro' && selectedCaps && <span className="text-muted-foreground ml-1">({selectedCaps})</span>}
                                                     </TableCell>
                                                     <TableCell>
                                                         {Number(item.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} / {um?.nome}
