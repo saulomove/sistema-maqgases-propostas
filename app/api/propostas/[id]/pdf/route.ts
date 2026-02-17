@@ -98,6 +98,7 @@ export async function GET(
                     unitPrice: proposal.locacaoValorUnitario,
                     total: proposal.locacaoValorTotal
                 } : undefined,
+                freteValor: proposal.freteValor ? Number(proposal.freteValor) : 0,
                 items: items, // Contains tipoGasNome, etc.
                 unit: {
                     nome: unit.nome,
