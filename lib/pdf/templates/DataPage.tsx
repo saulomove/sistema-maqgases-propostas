@@ -91,7 +91,7 @@ export const DataPage = ({
                 {/* Left Column: Client */}
                 <View style={{ flex: 1, paddingRight: 20 }}>
                     <Text style={{ fontSize: 8, color: '#9CA3AF', marginBottom: 4, letterSpacing: 0.5 }}>CLIENTE</Text>
-                    <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#111827', marginBottom: 2 }}>{clientName}</Text>
+                    <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#111827', marginBottom: 2 }}>{clientName.toUpperCase()}</Text>
                     <Text style={{ fontSize: 9, color: '#4B5563' }}>{clientLocation}</Text>
                 </View>
 
@@ -128,9 +128,9 @@ export const DataPage = ({
                         ...styles.tableRow,
                         backgroundColor: i % 2 === 0 ? '#FFFFFF' : '#F7FAFC' // Zebra striping
                     }}>
-                        <Text style={{ ...styles.tableCell, flex: 2.5 }}>{item.tipoGasNome}</Text>
-                        <Text style={{ ...styles.tableCell, flex: 0.8 }}>{item.capacidadeTexto || '-'}</Text>
-                        <Text style={{ ...styles.tableCell, flex: 0.8 }}>{item.unidadeMedidaNome}</Text>
+                        <Text style={{ ...styles.tableCell, flex: 2.5 }}>{item.tipoGasNome.toUpperCase()}</Text>
+                        <Text style={{ ...styles.tableCell, flex: 0.8 }}>{item.capacidadeTexto ? item.capacidadeTexto.toUpperCase() : '-'}</Text>
+                        <Text style={{ ...styles.tableCell, flex: 0.8 }}>{item.unidadeMedidaNome.toUpperCase()}</Text>
                         <Text style={{ ...styles.tableCell, flex: 1 }}>R$ {Number(item.valorUnitario).toFixed(2)}</Text>
                         <Text style={{ ...styles.tableCell, flex: 2, textAlign: 'right', paddingRight: 8, fontSize: 8 }}>{item.condicaoPagamentoDescricao}</Text>
                     </View>
