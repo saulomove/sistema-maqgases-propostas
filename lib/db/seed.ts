@@ -88,6 +88,8 @@ async function seed() {
         const unidadesMedidaData = [
             { nome: 'Kg', sigla: 'kg' },
             { nome: 'm³', sigla: 'm³' },
+            { nome: 'Unidade', sigla: 'un' },
+            { nome: 'Cilindro', sigla: 'cil' },
         ];
 
         for (let i = 0; i < unidadesMedidaData.length; i++) {
