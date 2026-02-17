@@ -118,48 +118,53 @@ async function seed() {
         console.log('🏢 Inserindo unidades reais...');
         const unidadesReais = [
             {
-                nome: 'Joaçaba/SC',
+                nome: 'Matriz – Joaçaba/SC',
                 razaoSocial: 'MaqGases Matriz',
-                endereco: 'Rua Armindo Raimundo Heberle, 415, Vila Remor - CEP 89600-000',
+                endereco: 'Rua Armindo Raimundo Heberle, 415\nVila Remor – CEP 89600-000',
                 cidade: 'Joaçaba',
                 uf: 'SC',
-                email: 'joacaba@maqgases.com.br', // Generic unit email (keep for reference if needed, but users are specific now)
+                email: 'vendas@maqgases.com.br',
+                telefone: '(49) 3521-0363',
                 site: 'www.maqgases.com.br'
             },
             {
-                nome: 'Palhoça/SC',
+                nome: 'Filial – Palhoça/SC',
                 razaoSocial: 'MaqGases Filial Palhoça',
-                endereco: 'Rua do Albatroz, 26, Pedra Branca - CEP 88137-290',
+                endereco: 'Rua do Albatroz, 26\nPedra Branca – CEP 88137-290',
                 cidade: 'Palhoça',
                 uf: 'SC',
-                email: 'palhoca@maqgases.com.br',
+                email: 'ivan@maqgases.com.br',
+                telefone: '(49) 3521-0363',
                 site: 'www.maqgases.com.br'
             },
             {
-                nome: 'Caxias do Sul/RS',
+                nome: 'Filial – Caxias do Sul/RS',
                 razaoSocial: 'MaqGases Filial Caxias',
-                endereco: 'Rua Olinda Pontalti Peteffi, 1176, Diamantino - CEP 95055-618',
+                endereco: 'Rua Olinda Pontalti Peteffi, 1176\nDiamantino – CEP 95055-618',
                 cidade: 'Caxias do Sul',
                 uf: 'RS',
-                email: 'caxias@maqgases.com.br',
+                email: 'vendascaxiasdosul@maqgases.com.br',
+                telefone: '(49) 3521-0363',
                 site: 'www.maqgases.com.br'
             },
             {
-                nome: 'Chapecó/SC',
+                nome: 'Filial – Chapecó/SC',
                 razaoSocial: 'MaqGases Filial Chapecó',
-                endereco: 'Rua Cuba, S/N QD 2014 Lote 01, Líder - CEP 89805-225',
+                endereco: 'Rua Cuba, S/N QD 2014 Lote 01\nLíder – CEP 89805-225',
                 cidade: 'Chapecó',
                 uf: 'SC',
-                email: 'chapeco@maqgases.com.br',
+                email: 'vendaschapeco@maqgases.com.br',
+                telefone: '(49) 3521-0363',
                 site: 'www.maqgases.com.br'
             },
             {
-                nome: 'Mafra/SC',
+                nome: 'Filial – Mafra/SC',
                 razaoSocial: 'MaqGases Filial Mafra',
-                endereco: 'Rua Benemerito Henrique Max, 930, Vila Nova - CEP 89304-326',
+                endereco: 'Rua Benemerito Henrique Max, 930\nVila Nova – CEP 89304-326',
                 cidade: 'Mafra',
                 uf: 'SC',
-                email: 'mafra@maqgases.com.br',
+                email: 'rosangela@maqgases.com.br',
+                telefone: '(49) 3521-0363',
                 site: 'www.maqgases.com.br'
             }
         ];
@@ -197,13 +202,13 @@ async function seed() {
         console.log('👤 Verificando Usuários Específicos...');
 
         const usuariosEspecificos = [
-            { nome: 'Marcelo Perinotti', email: 'vendaschapeco@maqgases.com.br', unidadeNome: 'Chapecó/SC', role: 'unidade' },
-            { nome: 'Rosangela Tchorney', email: 'rosangela@maqgases.com.br', unidadeNome: 'Mafra/SC', role: 'unidade' },
-            { nome: 'Ivan Cesar Ratti', email: 'ivan@maqgases.com.br', unidadeNome: 'Palhoça/SC', role: 'unidade' },
-            { nome: 'Edgar Junior Nicolini', email: 'vendascaxiasdosul@maqgases.com.br', unidadeNome: 'Caxias do Sul/RS', role: 'unidade' },
-            { nome: 'Maxwel Aguiar', email: 'vendas@maqgases.com.br', unidadeNome: 'Joaçaba/SC', role: 'unidade' },
-            { nome: 'Mauricio Ranckel', email: 'financeiro@maqgases.com.br', unidadeNome: 'Joaçaba/SC', role: 'unidade' }, // Financeiro com acesso de unidade? Ou admin? Pedido como usuário da lista.
-            { nome: 'Gabriel Bucco Parolin', email: 'admin@maqgases.com.br', unidadeNome: 'Joaçaba/SC', role: 'superadmin' }
+            { nome: 'Marcelo Perinotti', email: 'vendaschapeco@maqgases.com.br', unidadeNome: 'Filial – Chapecó/SC', role: 'unidade' },
+            { nome: 'Rosangela Tchorney', email: 'rosangela@maqgases.com.br', unidadeNome: 'Filial – Mafra/SC', role: 'unidade' },
+            { nome: 'Ivan Cesar Ratti', email: 'ivan@maqgases.com.br', unidadeNome: 'Filial – Palhoça/SC', role: 'unidade' },
+            { nome: 'Edgar Junior Nicolini', email: 'vendascaxiasdosul@maqgases.com.br', unidadeNome: 'Filial – Caxias do Sul/RS', role: 'unidade' },
+            { nome: 'Maxwel Aguiar', email: 'vendas@maqgases.com.br', unidadeNome: 'Matriz – Joaçaba/SC', role: 'unidade' },
+            { nome: 'Mauricio Ranckel', email: 'financeiro@maqgases.com.br', unidadeNome: 'Matriz – Joaçaba/SC', role: 'unidade' }, // Financeiro com acesso de unidade? Ou admin? Pedido como usuário da lista.
+            { nome: 'Gabriel Bucco Parolin', email: 'admin@maqgases.com.br', unidadeNome: 'Matriz – Joaçaba/SC', role: 'superadmin' }
         ];
 
         const defaultPassword = 'senha123'; // Could use specific passwords if provided, but default for now
@@ -261,11 +266,11 @@ async function seed() {
         console.log('| Unidade         | Login                    | Senha      |');
         console.log('|-----------------|--------------------------|------------|');
         console.log('| SUPER ADMIN     | admin@maqgases.com.br    | senha123   | (Apenas Gestão)');
-        console.log('| JOAÇABA (Matriz)| joacaba@maqgases.com.br  | joacaba123 | (Cria Proposta)');
-        console.log('| PALHOÇA         | palhoca@maqgases.com.br  | palhoca123 | (Cria Proposta)');
-        console.log('| CAXIAS DO SUL   | caxias@maqgases.com.br   | caxias123  | (Cria Proposta)');
-        console.log('| CHAPECÓ         | chapeco@maqgases.com.br  | chapeco123 | (Cria Proposta)');
-        console.log('| MAFRA           | mafra@maqgases.com.br    | mafra123   | (Cria Proposta)');
+        console.log('| JOAÇABA (Matriz)| vendas@maqgases.com.br   | senha123   | (Cria Proposta)');
+        console.log('| PALHOÇA         | ivan@maqgases.com.br     | senha123   | (Cria Proposta)');
+        console.log('| CAXIAS DO SUL   | vendascaxiasdosul@...    | senha123   | (Cria Proposta)');
+        console.log('| CHAPECÓ         | vendaschapeco@maq...     | senha123   | (Cria Proposta)');
+        console.log('| MAFRA           | rosangela@maqgases...    | senha123   | (Cria Proposta)');
         console.log('---------------------------------------------------------');
     } catch (error) {
         console.error('❌ Erro ao executar seed:', error);
