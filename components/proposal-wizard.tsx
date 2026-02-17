@@ -267,7 +267,7 @@ export function ProposalWizard({
     }
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
             {/* Progress Bar */}
             <div className="mb-8 relative flex justify-between">
                 <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10 -translate-y-1/2" />
