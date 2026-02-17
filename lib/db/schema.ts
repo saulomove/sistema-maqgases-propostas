@@ -158,6 +158,7 @@ export const propostaItens = pgTable('proposta_itens', {
 
     // Valores
     valorUnitario: decimal('valor_unitario', { precision: 10, scale: 2 }).notNull(),
+    freteValor: decimal('frete_valor', { precision: 10, scale: 2 }).default('0').notNull(),
 
     // Condição de Pagamento
     condicaoPagamentoId: integer('condicao_pagamento_id').references(() => condicoesPagamento.id),

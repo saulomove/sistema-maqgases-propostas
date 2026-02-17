@@ -54,7 +54,7 @@ interface ProposalWizardProps {
         locacaoAtiva: boolean
         locacaoQuantidade: number | null
         locacaoValorUnitario: number | null
-        freteValor: number | null
+        freteValor: number | null // LEGACY: keep for types, but unused in new UI
         items: any[]
     }
 }
@@ -66,6 +66,7 @@ type ProposalItem = {
     capacidadeIds: string[] // NEW: Multi-select support
     unidadeMedidaId: string
     valorUnitario: string
+    freteValor: string // NEW: Item level freight
     condicaoPagamentoId: string
 }
 
@@ -96,7 +97,9 @@ export function ProposalWizard({
         valorUnitario: initialData?.locacaoValorUnitario?.toString() || "",
     })
 
-    const [frete, setFrete] = useState(initialData?.freteValor?.toString() || "0")
+
+
+    // const [frete, setFrete] = useState(initialData?.freteValor?.toString() || "0") // DEPRECATED GLOBAL
 
     const [items, setItems] = useState<ProposalItem[]>(() => {
         if (!initialData?.items) return []
@@ -107,6 +110,8 @@ export function ProposalWizard({
             capacidadeIds: item.capacidadeId ? [item.capacidadeId.toString()] : [], // Init from legacy
             unidadeMedidaId: item.unidadeMedidaId.toString(),
             valorUnitario: item.valorUnitario.toString(),
+
+            freteValor: item.freteValor ? item.freteValor.toString() : "0",
             condicaoPagamentoId: item.condicaoPagamentoId.toString()
         }))
     })
@@ -127,6 +132,8 @@ export function ProposalWizard({
                 capacidadeIds: [],
                 unidadeMedidaId: "",
                 valorUnitario: "",
+
+                freteValor: "0",
                 condicaoPagamentoId: ""
             }
         ])
@@ -202,13 +209,15 @@ export function ProposalWizard({
                 locacaoQuantidade: locacao.enabled ? Number(locacao.quantidade) : null,
                 locacaoValorUnitario: locacao.enabled ? Number(locacao.valorUnitario) : null,
                 locacaoValorTotal: locacaoTotal,
-                freteValor: Number(frete),
+
+                freteValor: items.reduce((acc, item) => acc + (Number(item.freteValor) || 0), 0), // Sum of item freights
                 itens: items.map(item => ({
                     tipoGasId: Number(item.tipoGasId),
                     capacidadeId: item.capacidadeIds.length > 0 ? Number(item.capacidadeIds[0]) : null, // Primary Ref
                     capacidadeIds: item.capacidadeIds, // Send the list
                     unidadeMedidaId: Number(item.unidadeMedidaId),
                     valorUnitario: Number(item.valorUnitario),
+                    freteValor: Number(item.freteValor || 0),
                     condicaoPagamentoId: Number(item.condicaoPagamentoId)
                 }))
             }
@@ -404,18 +413,7 @@ export function ProposalWizard({
                                 </div>
                             )}
 
-                            {/* Frete Input */}
-                            <div className="p-4 border rounded-lg bg-gray-50 flex items-center gap-4">
-                                <Label className="text-base font-semibold whitespace-nowrap">Valor do Frete (R$)</Label>
-                                <Input
-                                    type="number"
-                                    value={frete}
-                                    onChange={(e) => setFrete(e.target.value)}
-                                    placeholder="0.00"
-                                    className="max-w-[200px]"
-                                />
-                                <span className="text-sm text-muted-foreground">Deixe 0 para isento.</span>
-                            </div>
+                            {/* Frete Input GLOBAL REMOVED */}
 
                             {/* Items Table */}
                             <div className="space-y-2">
@@ -433,7 +431,9 @@ export function ProposalWizard({
                                                 <TableHead className="w-[200px]">Descrição do Gás</TableHead>
                                                 {type === "cilindro" && <TableHead className="w-[120px]">Capacidade</TableHead>}
                                                 <TableHead className="w-[120px]">Unid.</TableHead>
+
                                                 <TableHead className="w-[120px]">Preço Unit.</TableHead>
+                                                <TableHead className="w-[100px]">Frete (R$)</TableHead>
                                                 <TableHead className="w-[200px]">Condição Pagto</TableHead>
                                                 <TableHead className="w-[80px]"></TableHead>
                                             </TableRow>
@@ -523,6 +523,15 @@ export function ProposalWizard({
                                                     </TableCell>
 
                                                     <TableCell>
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="0,00"
+                                                            value={item.freteValor}
+                                                            onChange={(e) => handleUpdateItem(item.id, 'freteValor', e.target.value)}
+                                                        />
+                                                    </TableCell>
+
+                                                    <TableCell>
                                                         <Select value={item.condicaoPagamentoId} onValueChange={(v) => handleUpdateItem(item.id, 'condicaoPagamentoId', v)}>
                                                             <SelectTrigger>
                                                                 <SelectValue placeholder="Condição" />
@@ -582,6 +591,7 @@ export function ProposalWizard({
                                         <TableRow>
                                             <TableHead>Descrição</TableHead>
                                             <TableHead>Preço Unit.</TableHead>
+                                            <TableHead>Frete</TableHead>
                                             <TableHead>Pagamento</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -601,6 +611,9 @@ export function ProposalWizard({
                                                     </TableCell>
                                                     <TableCell>
                                                         {Number(item.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} / {um?.nome}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {Number(item.freteValor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                                     </TableCell>
                                                     <TableCell>{pagto?.descricao}</TableCell>
                                                 </TableRow>

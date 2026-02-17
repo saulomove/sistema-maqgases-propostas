@@ -31,6 +31,9 @@ export async function POST(request: NextRequest) {
         const nextNum = Number(countResult[0].count) + 1;
         const proposalNumber = `${unitPrefix}-${year}-${nextNum.toString().padStart(5, '0')}`;
 
+        // Calculate total freight from items
+        const totalFreteItens = data.itens.reduce((acc: number, item: any) => acc + (Number(item.freteValor) || 0), 0);
+
         // 2. Create Proposal Record
         // Initialize with 0 totals, update later
         const [newProposal] = await db.insert(propostas).values({
@@ -43,7 +46,7 @@ export async function POST(request: NextRequest) {
             locacaoQuantidade: data.locacaoQuantidade ? data.locacaoQuantidade.toString() : null,
             locacaoValorUnitario: data.locacaoValorUnitario ? data.locacaoValorUnitario.toString() : null,
             locacaoValorTotal: data.locacaoValorTotal ? data.locacaoValorTotal.toString() : null,
-            freteValor: data.freteValor ? data.freteValor.toString() : "0",
+            freteValor: totalFreteItens.toString(), // Save total freight from items in proposal
             subtotalItens: "0",
             valorTotal: "0",
             unidadeId: unit.id,
@@ -73,7 +76,7 @@ export async function POST(request: NextRequest) {
             return res?.descricao || "";
         };
 
-        let itemsTotal = 0;
+        let itemsTotal = 0; // This will be the sum of valorUnitario for all items
 
         // Iterate and Insert Items
         // Using simple loop for logic clarity. 
@@ -99,6 +102,7 @@ export async function POST(request: NextRequest) {
                 const umNome = await getUMName(Number(item.unidadeMedidaId));
                 const payDesc = await getPayDesc(Number(item.condicaoPagamentoId));
                 const valUnit = Number(item.valorUnitario || 0);
+                const itemFreteValor = Number(item.freteValor || 0);
 
                 await db.insert(propostaItens).values({
                     propostaId: newProposal.id,
@@ -109,6 +113,7 @@ export async function POST(request: NextRequest) {
                     unidadeMedidaId: Number(item.unidadeMedidaId),
                     unidadeMedidaNome: umNome,
                     valorUnitario: valUnit.toString(),
+                    freteValor: itemFreteValor.toString(), // Add freteValor to item
                     condicaoPagamentoId: Number(item.condicaoPagamentoId),
                     condicaoPagamentoDescricao: payDesc,
                     ordem: 0
@@ -119,7 +124,9 @@ export async function POST(request: NextRequest) {
         }
 
         // 4. Update Proposal with Totals
-        const totalGeral = (Number(data.locacaoValorTotal || 0)) + itemsTotal + (Number(data.freteValor || 0));
+        // subtotalItens is the sum of valorUnitario from items
+        // valorTotal is locacaoValorTotal + subtotalItens + totalFreteItens
+        const totalGeral = (Number(data.locacaoValorTotal || 0)) + itemsTotal + totalFreteItens;
 
         await db.update(propostas)
             .set({

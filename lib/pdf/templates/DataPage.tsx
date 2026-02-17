@@ -119,11 +119,12 @@ export const DataPage = ({
             {/* ITEMS TABLE */}
             <View style={styles.table}>
                 <View style={styles.tableHeader}>
-                    <Text style={{ ...styles.tableHeaderCell, flex: 2.5 }}>DESCRIÇÃO</Text>
+                    <Text style={{ ...styles.tableHeaderCell, flex: 2.2 }}>DESCRIÇÃO</Text>
                     <Text style={{ ...styles.tableHeaderCell, flex: 0.8 }}>CAPACIDADE</Text>
-                    <Text style={{ ...styles.tableHeaderCell, flex: 0.8 }}>UNIDADE</Text>
+                    <Text style={{ ...styles.tableHeaderCell, flex: 0.7 }}>UNID.</Text>
                     <Text style={{ ...styles.tableHeaderCell, flex: 1 }}>VALOR UNIT.</Text>
-                    <Text style={{ ...styles.tableHeaderCell, flex: 2, textAlign: 'right', paddingRight: 8 }}>PAGAMENTO</Text>
+                    <Text style={{ ...styles.tableHeaderCell, flex: 0.9 }}>FRETE</Text>
+                    <Text style={{ ...styles.tableHeaderCell, flex: 1.5, textAlign: 'right', paddingRight: 8 }}>PAGAMENTO</Text>
                 </View>
 
                 {items.map((item, i) => (
@@ -131,11 +132,12 @@ export const DataPage = ({
                         ...styles.tableRow,
                         backgroundColor: i % 2 === 0 ? '#FFFFFF' : '#F7FAFC' // Zebra striping
                     }}>
-                        <Text style={{ ...styles.tableCell, flex: 2.5 }}>{item.tipoGasNome.toUpperCase()}</Text>
+                        <Text style={{ ...styles.tableCell, flex: 2.2 }}>{item.tipoGasNome.toUpperCase()}</Text>
                         <Text style={{ ...styles.tableCell, flex: 0.8 }}>{item.capacidadeTexto ? item.capacidadeTexto.toUpperCase() : '-'}</Text>
-                        <Text style={{ ...styles.tableCell, flex: 0.8 }}>{item.unidadeMedidaNome.toUpperCase()}</Text>
+                        <Text style={{ ...styles.tableCell, flex: 0.7 }}>{item.unidadeMedidaNome.toUpperCase()}</Text>
                         <Text style={{ ...styles.tableCell, flex: 1 }}>R$ {Number(item.valorUnitario).toFixed(2)}</Text>
-                        <Text style={{ ...styles.tableCell, flex: 2, textAlign: 'right', paddingRight: 8, fontSize: 8 }}>{item.condicaoPagamentoDescricao}</Text>
+                        <Text style={{ ...styles.tableCell, flex: 0.9 }}>R$ {Number(item.freteValor || 0).toFixed(2)}</Text>
+                        <Text style={{ ...styles.tableCell, flex: 1.5, textAlign: 'right', paddingRight: 8, fontSize: 8 }}>{item.condicaoPagamentoDescricao}</Text>
                     </View>
                 ))}
             </View>
