@@ -4,17 +4,15 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-// Using a simplified password hashing approach or saving plain for now based on previous context 
-// (assuming plain 'senha123' mentioned in task, but should ideally hash. For this speedrun task I might skip bcrypt unless installed).
-// The project seems to use plain text comparison in auth? Let's check `lib/auth.ts` if possible, but safely assume we just store string.
-// Wait, `lib/auth` was not fully visible but user used `senha123`.
+import bcrypt from 'bcryptjs';
 
 export async function createUser(data: { nome: string; email: string; senha?: string; role: 'superadmin' | 'unidade'; unidadeId?: number }) {
+    const hashedPassword = await bcrypt.hash(data.senha || 'senha123', 10);
+
     await db.insert(users).values({
         nome: data.nome,
         email: data.email,
-        senha: data.senha || 'senha123', // Default password
+        senha: hashedPassword,
         role: data.role,
         unidadeId: data.unidadeId || null
     });
@@ -29,7 +27,7 @@ export async function updateUser(id: number, data: { nome: string; email: string
         unidadeId: data.unidadeId
     };
     if (data.senha) {
-        updateData.senha = data.senha;
+        updateData.senha = await bcrypt.hash(data.senha, 10);
     }
 
     await db.update(users).set(updateData).where(eq(users.id, id));
