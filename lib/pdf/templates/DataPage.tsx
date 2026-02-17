@@ -20,6 +20,7 @@ interface DataPageProps {
         unitPrice: number;
         total: number;
     };
+    freteValor: number;
 }
 
 export const DataPage = ({
@@ -33,13 +34,15 @@ export const DataPage = ({
     clientName,
     clientLocation,
     sellerName,
+
     items,
-    locacao
+    locacao,
+    freteValor
 }: DataPageProps) => {
 
     // Calculate Totals
     const itemsTotal = items.reduce((acc, item) => acc + Number(item.valorUnitario), 0);
-    const totalGeneral = itemsTotal + (locacao?.active ? Number(locacao.total) : 0);
+    const totalGeneral = itemsTotal + (locacao?.active ? Number(locacao.total) : 0) + freteValor;
 
     return (
         <Page size="A4" style={styles.page}>
@@ -151,6 +154,20 @@ export const DataPage = ({
                     </View>
                 </View>
             )}
+
+            {/* FRETE SECTION (Optional Display if > 0) */}
+            {freteValor > 0 && (
+                <View style={{ marginBottom: 20, paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
+                    <Text style={{ fontSize: 10, color: '#374151', fontWeight: 'bold' }}>FRETE:</Text>
+                    <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#111827' }}>R$ {freteValor.toFixed(2)}</Text>
+                </View>
+            )}
+
+            {/* GRAND TOTAL */}
+            <View style={{ marginTop: 10, borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingTop: 10, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
+                <Text style={{ fontSize: 12, color: '#111827', fontWeight: 'bold' }}>VALOR TOTAL:</Text>
+                <Text style={{ fontSize: 14, fontWeight: '900', color: '#00A0E3' }}>R$ {totalGeneral.toFixed(2)}</Text>
+            </View>
 
 
 

@@ -54,6 +54,7 @@ interface ProposalWizardProps {
         locacaoAtiva: boolean
         locacaoQuantidade: number | null
         locacaoValorUnitario: number | null
+        freteValor: number | null
         items: any[]
     }
 }
@@ -94,6 +95,8 @@ export function ProposalWizard({
         quantidade: initialData?.locacaoQuantidade?.toString() || "",
         valorUnitario: initialData?.locacaoValorUnitario?.toString() || "",
     })
+
+    const [frete, setFrete] = useState(initialData?.freteValor?.toString() || "0")
 
     const [items, setItems] = useState<ProposalItem[]>(() => {
         if (!initialData?.items) return []
@@ -199,6 +202,7 @@ export function ProposalWizard({
                 locacaoQuantidade: locacao.enabled ? Number(locacao.quantidade) : null,
                 locacaoValorUnitario: locacao.enabled ? Number(locacao.valorUnitario) : null,
                 locacaoValorTotal: locacaoTotal,
+                freteValor: Number(frete),
                 itens: items.map(item => ({
                     tipoGasId: Number(item.tipoGasId),
                     capacidadeId: item.capacidadeIds.length > 0 ? Number(item.capacidadeIds[0]) : null, // Primary Ref
@@ -399,6 +403,19 @@ export function ProposalWizard({
                                     )}
                                 </div>
                             )}
+
+                            {/* Frete Input */}
+                            <div className="p-4 border rounded-lg bg-gray-50 flex items-center gap-4">
+                                <Label className="text-base font-semibold whitespace-nowrap">Valor do Frete (R$)</Label>
+                                <Input
+                                    type="number"
+                                    value={frete}
+                                    onChange={(e) => setFrete(e.target.value)}
+                                    placeholder="0.00"
+                                    className="max-w-[200px]"
+                                />
+                                <span className="text-sm text-muted-foreground">Deixe 0 para isento.</span>
+                            </div>
 
                             {/* Items Table */}
                             <div className="space-y-2">

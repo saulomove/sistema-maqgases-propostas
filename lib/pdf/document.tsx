@@ -17,6 +17,7 @@ interface ProposalData {
         unitPrice: number;
         total: number;
     };
+    freteValor?: number;
     items: any[];
     unit: {
         nome: string;
@@ -78,6 +79,7 @@ export const ProposalDocument = ({ data }: { data: ProposalData }) => {
                 sellerName={data.seller.nome}
                 items={data.items}
                 locacao={data.locacao}
+                freteValor={Number(data.freteValor || 0)}
             />
         </Document>
     );

@@ -114,6 +114,9 @@ export const propostas = pgTable('propostas', {
     locacaoValorUnitario: decimal('locacao_valor_unitario', { precision: 10, scale: 2 }),
     locacaoValorTotal: decimal('locacao_valor_total', { precision: 10, scale: 2 }),
 
+    // Frete
+    freteValor: decimal('frete_valor', { precision: 10, scale: 2 }).default('0'),
+
     // Totais
     subtotalItens: decimal('subtotal_itens', { precision: 10, scale: 2 }).default('0').notNull(),
     valorTotal: decimal('valor_total', { precision: 10, scale: 2 }).default('0').notNull(),

@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
             locacaoQuantidade: data.locacaoQuantidade ? data.locacaoQuantidade.toString() : null,
             locacaoValorUnitario: data.locacaoValorUnitario ? data.locacaoValorUnitario.toString() : null,
             locacaoValorTotal: data.locacaoValorTotal ? data.locacaoValorTotal.toString() : null,
+            freteValor: data.freteValor ? data.freteValor.toString() : "0",
             subtotalItens: "0",
             valorTotal: "0",
             unidadeId: unit.id,
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 4. Update Proposal with Totals
-        const totalGeral = (Number(data.locacaoValorTotal || 0)) + itemsTotal;
+        const totalGeral = (Number(data.locacaoValorTotal || 0)) + itemsTotal + (Number(data.freteValor || 0));
 
         await db.update(propostas)
             .set({
