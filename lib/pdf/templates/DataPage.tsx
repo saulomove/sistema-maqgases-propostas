@@ -138,11 +138,15 @@ export const DataPage = ({
             </View>
 
             {/* LOCACAO SECTION */}
-            {type === 'cilindro' && locacao?.active && (
+            {locacao?.active && (
                 <View style={{ marginTop: 20, marginBottom: 20, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 6, padding: 15 }}>
-                    <Text style={{ ...styles.sectionTitle, fontSize: 11, marginBottom: 8, color: '#0B9BD9' }}>Locação de Cilindros Mensal</Text>
+                    <Text style={{ ...styles.sectionTitle, fontSize: 11, marginBottom: 8, color: '#0B9BD9' }}>
+                        {type === 'liquido' ? 'Locação de Tanque / Telemetria' : 'Locação de Cilindros Mensal'}
+                    </Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 10, color: '#374151' }}>{locacao.quantity} cilindros x R$ {Number(locacao.unitPrice).toFixed(2)}</Text>
+                        <Text style={{ fontSize: 10, color: '#374151' }}>
+                            {locacao.quantity} {type === 'liquido' ? 'un' : 'cilindros'} x R$ {Number(locacao.unitPrice).toFixed(2)}
+                        </Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#111827' }}>Total: R$ {Number(locacao.total).toFixed(2)}</Text>
                     </View>
                 </View>
