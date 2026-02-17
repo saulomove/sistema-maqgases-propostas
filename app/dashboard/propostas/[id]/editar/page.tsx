@@ -47,6 +47,7 @@ export default async function EditarPropostaPage({ params }: { params: Promise<{
         locacaoAtiva: proposal.locacaoAtiva || false,
         locacaoQuantidade: proposal.locacaoQuantidade ? Number(proposal.locacaoQuantidade) : null,
         locacaoValorUnitario: proposal.locacaoValorUnitario ? Number(proposal.locacaoValorUnitario) : null,
+        freteValor: proposal.freteValor ? Number(proposal.freteValor) : null,
         items: items
     };
 
