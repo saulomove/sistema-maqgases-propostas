@@ -20,7 +20,31 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Unidade not found" }, { status: 400 });
         }
 
-        const unitPrefix = unit.nome.substring(0, 3).toUpperCase();
+        // Extract city abbreviation from unit name to avoid prefix collisions.
+        // Format: "Matriz – Joaçaba/SC" → "JOA"  |  "Filial – Caxias do Sul/RS" → "CXS"
+        // Fallback: first 3 chars of name + unit ID (e.g. FIL3) if no " – " separator found.
+        let unitPrefix: string;
+        const dashSeparatorIdx = unit.nome.indexOf(' – ');
+        if (dashSeparatorIdx !== -1) {
+            // Take the city part after " – " and before "/" (if any)
+            const afterDash = unit.nome.substring(dashSeparatorIdx + 3); // e.g. "Caxias do Sul/RS" or "Joaçaba/SC"
+            const cityName = afterDash.split('/')[0].trim(); // e.g. "Caxias do Sul" or "Joaçaba"
+            // Build 3-char abbreviation from the city name words
+            const words = cityName.split(' ').filter(w => w.length > 0);
+            if (words.length === 1) {
+                unitPrefix = words[0].substring(0, 3).toUpperCase();
+            } else {
+                // Multi-word city: take first letter of each word up to 3
+                unitPrefix = words.slice(0, 3).map(w => w[0]).join('').toUpperCase();
+                // Pad to at least 3 chars if needed
+                if (unitPrefix.length < 3) {
+                    unitPrefix = (unitPrefix + words[0].substring(1, 3).toUpperCase()).substring(0, 3);
+                }
+            }
+        } else {
+            // Fallback: first 3 chars + unit ID to guarantee uniqueness
+            unitPrefix = unit.nome.substring(0, 3).toUpperCase() + unit.id;
+        }
         const year = new Date().getFullYear();
 
         // Simple sequential count for MVP

@@ -39,7 +39,7 @@ export async function setAuthCookie(payload: UserPayload) {
 
     cookieStore.set(TOKEN_NAME, token, {
         httpOnly: true,
-        secure: false, // Force false for localhost debugging
+        secure: process.env.NODE_ENV === 'production', // true in production (HTTPS), false in localhost
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 7 dias
         path: '/',
