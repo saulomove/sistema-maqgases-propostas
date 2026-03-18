@@ -47,36 +47,60 @@ export async function POST(request: NextRequest) {
         }
         const year = new Date().getFullYear();
 
-        // Simple sequential count for MVP
-        const countResult = await db.select({ count: sql<number>`count(*)` })
+        // Find the MAX sequential number from ALL existing proposals of this unit
+        // This handles deletions and prefix changes correctly
+        const maxResult = await db.select({ 
+            maxNum: sql<string>`MAX(CAST(SPLIT_PART(numero, '-', 3) AS INTEGER))` 
+        })
             .from(propostas)
             .where(eq(propostas.unidadeId, unit.id));
 
-        const nextNum = Number(countResult[0].count) + 1;
-        const proposalNumber = `${unitPrefix}-${year}-${nextNum.toString().padStart(5, '0')}`;
+        const lastNum = Number(maxResult[0]?.maxNum) || 0;
+        let nextNum = lastNum + 1;
+        let proposalNumber = `${unitPrefix}-${year}-${nextNum.toString().padStart(5, '0')}`;
 
         // Calculate total freight from items
         const totalFreteItens = data.itens.reduce((acc: number, item: any) => acc + (Number(item.freteValor) || 0), 0);
 
-        // 2. Create Proposal Record
-        // Initialize with 0 totals, update later
-        const [newProposal] = await db.insert(propostas).values({
-            numero: proposalNumber,
-            tipo: data.tipo,
-            status: 'gerada',
-            clienteNome: data.clienteNome,
-            clienteLocalEntrega: data.clienteLocalEntrega,
-            locacaoAtiva: data.locacaoAtiva,
-            locacaoQuantidade: data.locacaoQuantidade ? data.locacaoQuantidade.toString() : null,
-            locacaoValorUnitario: data.locacaoValorUnitario ? data.locacaoValorUnitario.toString() : null,
-            locacaoValorTotal: data.locacaoValorTotal ? data.locacaoValorTotal.toString() : null,
-            freteValor: totalFreteItens.toString(), // Save total freight from items in proposal
-            subtotalItens: "0",
-            valorTotal: "0",
-            unidadeId: unit.id,
-            usuarioId: user.id,
-            snapshot: JSON.stringify(data), // Save full raw payload
-        }).returning();
+        // 2. Create Proposal Record with retry for UNIQUE collisions
+        let newProposal: any;
+        const MAX_RETRIES = 5;
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            try {
+                const [result] = await db.insert(propostas).values({
+                    numero: proposalNumber,
+                    tipo: data.tipo,
+                    status: 'gerada',
+                    clienteNome: data.clienteNome,
+                    clienteLocalEntrega: data.clienteLocalEntrega,
+                    locacaoAtiva: data.locacaoAtiva,
+                    locacaoQuantidade: data.locacaoQuantidade ? data.locacaoQuantidade.toString() : null,
+                    locacaoValorUnitario: data.locacaoValorUnitario ? data.locacaoValorUnitario.toString() : null,
+                    locacaoValorTotal: data.locacaoValorTotal ? data.locacaoValorTotal.toString() : null,
+                    freteValor: totalFreteItens.toString(),
+                    subtotalItens: "0",
+                    valorTotal: "0",
+                    unidadeId: unit.id,
+                    usuarioId: user.id,
+                    snapshot: JSON.stringify(data),
+                }).returning();
+                newProposal = result;
+                break; // Success, exit retry loop
+            } catch (insertError: any) {
+                // If UNIQUE violation, increment and retry
+                if (insertError?.message?.includes('unique') || insertError?.message?.includes('duplicate') || insertError?.code === '23505') {
+                    nextNum++;
+                    proposalNumber = `${unitPrefix}-${year}-${nextNum.toString().padStart(5, '0')}`;
+                    console.warn(`Proposal number collision, retrying with ${proposalNumber} (attempt ${attempt + 2})`);
+                    continue;
+                }
+                throw insertError; // Re-throw non-UNIQUE errors
+            }
+        }
+
+        if (!newProposal) {
+            return NextResponse.json({ error: "Failed to generate unique proposal number after retries" }, { status: 500 });
+        }
 
         // 3. Process Items
         // We need to fetch names to save snapshot data into columns
