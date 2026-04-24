@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/table';
 import { PlusCircle, Search, FileText } from 'lucide-react';
 import { ProposalActions } from '@/components/proposals/proposal-actions';
+import { SituacaoSelect } from '@/components/proposals/situacao-select';
+import type { PropostaSituacao } from '@/lib/actions/proposals';
 import { db } from '@/lib/db';
 import { propostas } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
@@ -91,6 +93,7 @@ export default async function PropostasPage() {
                                         <TableHead>Data</TableHead>
                                         <TableHead>Valor Total</TableHead>
                                         <TableHead>Status</TableHead>
+                                        <TableHead>Situação</TableHead>
                                         <TableHead className="text-right">Ações</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -119,6 +122,12 @@ export default async function PropostasPage() {
                                                 } className="capitalize">
                                                     {proposta.status}
                                                 </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <SituacaoSelect
+                                                    proposalId={proposta.id}
+                                                    situacaoAtual={proposta.situacao as PropostaSituacao}
+                                                />
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <ProposalActions proposalId={proposta.id} />

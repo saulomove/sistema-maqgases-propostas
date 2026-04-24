@@ -4,6 +4,7 @@ import { relations } from 'drizzle-orm';
 // Enums
 export const userRoleEnum = pgEnum('user_role', ['superadmin', 'unidade']);
 export const propostaStatusEnum = pgEnum('proposta_status', ['rascunho', 'gerada', 'enviada']);
+export const propostaSituacaoEnum = pgEnum('proposta_situacao', ['aberto', 'em_espera', 'aprovado', 'fechado', 'cancelado']);
 export const propostaTipoEnum = pgEnum('proposta_tipo', ['cilindro', 'liquido']);
 export const capacidadeUnidadeEnum = pgEnum('capacidade_unidade', ['kg', 'm3']);
 
@@ -103,6 +104,7 @@ export const propostas = pgTable('propostas', {
     numero: text('numero').notNull().unique(), // Ex: "JOA-2026-00001"
     tipo: propostaTipoEnum('tipo').notNull(),
     status: propostaStatusEnum('status').default('rascunho').notNull(),
+    situacao: propostaSituacaoEnum('situacao').default('aberto').notNull(),
 
     // Cliente
     clienteNome: text('cliente_nome').notNull(),

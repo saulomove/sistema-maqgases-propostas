@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Download, Pencil } from "lucide-react";
 import Link from "next/link";
+import { SituacaoSelect } from "@/components/proposals/situacao-select";
+import type { PropostaSituacao } from "@/lib/actions/proposals";
 
 export default async function VisualizarPropostaPage({ params }: { params: Promise<{ id: string }> }) {
     const user = await getCurrentUser();
@@ -92,10 +94,18 @@ export default async function VisualizarPropostaPage({ params }: { params: Promi
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Detalhes</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-1">
+                    <CardContent className="space-y-2">
                         <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Tipo:</span>
                             <span className="font-medium capitalize">{proposal.tipo}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-muted-foreground">Situação:</span>
+                            <SituacaoSelect
+                                proposalId={proposal.id}
+                                situacaoAtual={proposal.situacao as PropostaSituacao}
+                                variant="full"
+                            />
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Total:</span>
