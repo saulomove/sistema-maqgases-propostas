@@ -17,10 +17,11 @@ import {
     PlusCircle
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { UserPayload } from '@/lib/auth';
+import type { SessionUser } from '@/lib/permissions';
+import { canManageCatalogos, canManageConfiguracoes, canManageUsers, ROLE_LABELS } from '@/lib/permissions';
 
 interface SidebarProps {
-    user: UserPayload | null;
+    user: SessionUser | null;
 }
 
 export function Sidebar({ user }: SidebarProps) {
@@ -28,7 +29,10 @@ export function Sidebar({ user }: SidebarProps) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 
-    const isSuperAdmin = user?.role === 'superadmin';
+    // Cada item do menu segue a mesma regra usada no servidor
+    const podeGerenciarUsuarios = canManageUsers(user);
+    const podeGerenciarCatalogos = canManageCatalogos(user);
+    const podeGerenciarConfiguracoes = canManageConfiguracoes(user);
 
     const handleLogout = async () => {
         await fetch('/api/auth/logout', { method: 'POST' });
@@ -56,21 +60,21 @@ export function Sidebar({ user }: SidebarProps) {
             href: '/dashboard/admin/catalogos',
             icon: Database,
             active: pathname.startsWith('/dashboard/admin/catalogos'),
-            show: isSuperAdmin,
+            show: podeGerenciarCatalogos,
         },
         {
             title: 'Usuários',
             href: '/dashboard/admin/usuarios',
             icon: Users,
             active: pathname.startsWith('/dashboard/admin/usuarios'),
-            show: isSuperAdmin,
+            show: podeGerenciarUsuarios,
         },
         {
             title: 'Configurações',
             href: '/dashboard/admin/configuracoes',
             icon: Settings,
             active: pathname.startsWith('/dashboard/admin/configuracoes'),
-            show: isSuperAdmin,
+            show: podeGerenciarConfiguracoes,
         },
     ];
 
@@ -117,7 +121,7 @@ export function Sidebar({ user }: SidebarProps) {
                         <div className="flex flex-col overflow-hidden">
                             <span className="text-sm font-medium truncate">{user?.nome}</span>
                             <span className="text-xs text-muted-foreground truncate">
-                                {isSuperAdmin ? 'SuperAdmin' : `Unidade ${user?.unidadeId}`}
+                                {user ? ROLE_LABELS[user.role] : ''}
                             </span>
                         </div>
                     </div>

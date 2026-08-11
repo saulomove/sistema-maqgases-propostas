@@ -38,13 +38,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Criar sessão
+        // Criar sessão — o token guarda só a identidade;
+        // papel e escopo são lidos do banco a cada requisição
         await setAuthCookie({
             id: user.id,
             nome: user.nome,
             email: user.email,
-            role: user.role,
-            unidadeId: user.unidadeId,
         });
 
         return NextResponse.json({
@@ -54,6 +53,7 @@ export async function POST(request: NextRequest) {
                 nome: user.nome,
                 email: user.email,
                 role: user.role,
+                escopoVisibilidade: user.escopoVisibilidade,
                 unidadeId: user.unidadeId,
             },
         });

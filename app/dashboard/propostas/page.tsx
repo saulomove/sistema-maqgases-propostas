@@ -17,26 +17,21 @@ import { SituacaoSelect } from '@/components/proposals/situacao-select';
 import type { PropostaSituacao } from '@/lib/actions/proposals';
 import { db } from '@/lib/db';
 import { propostas } from '@/lib/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/auth';
+import { propostaVisibilityFilter } from '@/lib/permissions';
 
 export default async function PropostasPage() {
     const user = await getCurrentUser();
     if (!user) return null;
 
-    // Buscar propostas (filtrar por unidade se não for superadmin)
-    // Nota: Em uma app real, isso deveria ser uma Server Action ou API com paginação
-    // Por simplicidade, buscando tudo e deixando o Drizzle otimizar
-
-    let query = db.select().from(propostas).orderBy(desc(propostas.createdAt));
-
-    if (user.role !== 'superadmin' && user.unidadeId) {
-        // @ts-ignore - Drizzle query builder types can be tricky with conditionals
-        query = query.where(eq(propostas.unidadeId, user.unidadeId));
-    }
-
-    // Executa query
-    const propostasList = await query;
+    // O escopo de visibilidade do usuário define o que aparece aqui:
+    // só as próprias, as da unidade dele, ou todas.
+    const propostasList = await db
+        .select()
+        .from(propostas)
+        .where(propostaVisibilityFilter(user))
+        .orderBy(desc(propostas.createdAt));
 
     return (
         <div className="space-y-6">

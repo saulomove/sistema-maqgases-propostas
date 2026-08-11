@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { propostas } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/auth';
+import { canEditProposta } from '@/lib/permissions';
 import { revalidatePath } from 'next/cache';
 
 export type PropostaSituacao = 'aberto' | 'em_espera' | 'aprovado' | 'fechado' | 'cancelado';
@@ -21,7 +22,7 @@ export async function updateProposalSituacao(proposalId: number, situacao: Propo
             return { error: 'Proposal not found' };
         }
 
-        if (user.role !== 'superadmin' && user.unidadeId !== proposal.unidadeId) {
+        if (!canEditProposta(user, proposal)) {
             return { error: 'Forbidden' };
         }
 
@@ -53,7 +54,7 @@ export async function deleteProposal(proposalId: number) {
         }
 
         // Validate permissions
-        if (user.role !== 'superadmin' && user.unidadeId !== proposal.unidadeId) {
+        if (!canEditProposta(user, proposal)) {
             return { error: 'Forbidden' };
         }
 

@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { unidadesMedida, users, unidades } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { getCurrentUser } from "@/lib/auth";
+import { canManageCatalogos } from "@/lib/permissions";
 
 // TEMPORARY ENDPOINT - Run once to fix production DB
+// As rotas /api/* não passam pelo middleware, então a checagem é feita aqui.
 export async function POST(request: NextRequest) {
+    const user = await getCurrentUser();
+    if (!canManageCatalogos(user)) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
         console.log("🔧 Starting Production DB Fix...");
 

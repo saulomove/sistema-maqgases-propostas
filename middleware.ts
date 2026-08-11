@@ -17,15 +17,13 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // Verificar autenticação para rotas protegidas
+    // O middleware cuida apenas da AUTENTICAÇÃO (tem sessão válida?).
+    // A AUTORIZAÇÃO por papel fica nas próprias páginas e Server Actions,
+    // que têm acesso ao banco e cobrem também as chamadas que não passam por aqui.
     if (protectedPaths.some(path => pathname.startsWith(path))) {
         const token = request.cookies.get('maqgases_auth_token')?.value;
 
-        console.log(`[Middleware] Accessing ${pathname}`);
-        console.log(`[Middleware] Token found: ${!!token}`);
-
         if (!token) {
-            console.log('[Middleware] No token, redirecting to login');
             const loginUrl = new URL('/login', request.url);
             loginUrl.searchParams.set('redirect', pathname);
             return NextResponse.redirect(loginUrl);
@@ -33,18 +31,8 @@ export async function middleware(request: NextRequest) {
 
         try {
             // Use jose for Edge-compatible verification
-            const { payload } = await jwtVerify(token, encodedSecret);
-            const user = payload as any; // Cast generic payload
-
-            console.log(`[Middleware] Token valid, user role: ${user.role}`);
-
-            // Verificar acesso a rotas de admin
-            if (pathname.startsWith('/dashboard/admin') && user.role !== 'superadmin') {
-                return NextResponse.redirect(new URL('/dashboard', request.url));
-            }
-
-        } catch (error) {
-            console.error('[Middleware] Invalid token:', error);
+            await jwtVerify(token, encodedSecret);
+        } catch {
             const loginUrl = new URL('/login', request.url);
             loginUrl.searchParams.set('redirect', pathname);
             return NextResponse.redirect(loginUrl);

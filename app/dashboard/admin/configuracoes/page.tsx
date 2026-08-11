@@ -1,4 +1,11 @@
-export default function AdminConfiguracoesPage() {
+import { getCurrentUser } from "@/lib/auth";
+import { canManageConfiguracoes } from "@/lib/permissions";
+import { redirect } from "next/navigation";
+
+export default async function AdminConfiguracoesPage() {
+    const user = await getCurrentUser();
+    if (!canManageConfiguracoes(user)) redirect('/dashboard/propostas');
+
     return (
         <div className="space-y-6">
             <div>

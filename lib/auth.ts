@@ -1,17 +1,27 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
+import { cache } from 'react';
+import { eq } from 'drizzle-orm';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import type { SessionUser } from '@/lib/permissions';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production';
 const TOKEN_NAME = 'maqgases_auth_token';
 
+/**
+ * Conteúdo do JWT. Serve apenas para identificar quem é o usuário —
+ * papel, escopo e status são sempre lidos do banco em `getCurrentUser`,
+ * para que mudanças de permissão valham na hora e não só no próximo login.
+ */
 export interface UserPayload {
     id: number;
     nome: string;
     email: string;
-    role: 'superadmin' | 'unidade';
-    unidadeId: number | null;
 }
+
+export type { SessionUser };
 
 export async function hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 10);
@@ -52,21 +62,57 @@ export async function getAuthToken(): Promise<string | null> {
     return token?.value || null;
 }
 
-export async function getCurrentUser(): Promise<UserPayload | null> {
+/**
+ * Usuário da requisição atual, com papel e escopo lidos do banco.
+ *
+ * Devolve null se o token for inválido, o usuário não existir mais ou
+ * estiver desativado — assim desativar alguém encerra o acesso na hora,
+ * sem esperar o token de 7 dias expirar.
+ *
+ * `cache` do React deduplica a consulta dentro da mesma requisição.
+ */
+export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     const token = await getAuthToken();
     if (!token) return null;
-    return verifyToken(token);
-}
+
+    const payload = verifyToken(token);
+    if (!payload) return null;
+
+    const [user] = await db
+        .select({
+            id: users.id,
+            nome: users.nome,
+            email: users.email,
+            role: users.role,
+            escopoVisibilidade: users.escopoVisibilidade,
+            unidadeId: users.unidadeId,
+            ativo: users.ativo,
+        })
+        .from(users)
+        .where(eq(users.id, payload.id))
+        .limit(1);
+
+    if (!user || !user.ativo) return null;
+
+    return {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        role: user.role,
+        escopoVisibilidade: user.escopoVisibilidade,
+        unidadeId: user.unidadeId,
+    };
+});
 
 export async function clearAuthCookie() {
     const cookieStore = await cookies();
     cookieStore.delete(TOKEN_NAME);
 }
 
-export function requireSuperAdmin(user: UserPayload | null): boolean {
+export function requireSuperAdmin(user: SessionUser | null): boolean {
     return user?.role === 'superadmin';
 }
 
-export function requireAuth(user: UserPayload | null): boolean {
+export function requireAuth(user: SessionUser | null): boolean {
     return user !== null;
 }

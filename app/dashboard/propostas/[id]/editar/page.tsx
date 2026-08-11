@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { propostas, propostaItens, tiposGas, capacidades, unidadesMedida, condicoesPagamento } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth";
+import { canEditProposta } from "@/lib/permissions";
 import { ProposalWizard } from "@/components/proposal-wizard";
 import { asc, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
@@ -18,7 +19,7 @@ export default async function EditarPropostaPage({ params }: { params: Promise<{
     if (!proposal) notFound();
 
     // Check permissions
-    if (user.role !== 'superadmin' && proposal.unidadeId !== user.unidadeId) {
+    if (!canEditProposta(user, proposal)) {
         redirect('/dashboard/propostas');
     }
 

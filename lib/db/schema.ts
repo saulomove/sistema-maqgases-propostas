@@ -2,7 +2,9 @@ import { pgTable, text, serial, integer, timestamp, boolean, decimal, pgEnum } f
 import { relations } from 'drizzle-orm';
 
 // Enums
-export const userRoleEnum = pgEnum('user_role', ['superadmin', 'unidade']);
+export const userRoleEnum = pgEnum('user_role', ['superadmin', 'admin', 'unidade']);
+// Escopo de visibilidade das propostas — independente do papel (role)
+export const escopoVisibilidadeEnum = pgEnum('escopo_visibilidade', ['proprias', 'unidade', 'todas']);
 export const propostaStatusEnum = pgEnum('proposta_status', ['rascunho', 'gerada', 'enviada']);
 export const propostaSituacaoEnum = pgEnum('proposta_situacao', ['aberto', 'em_espera', 'aprovado', 'fechado', 'cancelado']);
 export const propostaTipoEnum = pgEnum('proposta_tipo', ['cilindro', 'liquido']);
@@ -32,6 +34,8 @@ export const users = pgTable('users', {
     email: text('email').notNull().unique(),
     senha: text('senha').notNull(), // Hash bcrypt
     role: userRoleEnum('role').notNull().default('unidade'),
+    // Quais propostas este usuário enxerga: só as próprias, as da unidade dele, ou todas
+    escopoVisibilidade: escopoVisibilidadeEnum('escopo_visibilidade').notNull().default('proprias'),
     unidadeId: integer('unidade_id').references(() => unidades.id),
     ativo: boolean('ativo').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),

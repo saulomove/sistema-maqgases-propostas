@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { propostas, propostaItens, tiposGas, capacidades, unidadesMedida, condicoesPagamento } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth";
+import { canViewProposta } from "@/lib/permissions";
 import { asc, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +26,7 @@ export default async function VisualizarPropostaPage({ params }: { params: Promi
     if (!proposal) notFound();
 
     // Check permissions
-    if (user.role !== 'superadmin' && proposal.unidadeId !== user.unidadeId) {
+    if (!canViewProposta(user, proposal)) {
         redirect('/dashboard/propostas');
     }
 

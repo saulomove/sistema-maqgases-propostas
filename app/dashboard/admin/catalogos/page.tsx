@@ -9,8 +9,14 @@ import { GasTypesTable } from "./components/gas-types-table";
 import { CapacitiesTable } from "./components/capacities-table";
 import { UnitMeasuresTable } from "./components/unit-measures-table";
 import { PaymentTermsTable } from "./components/payment-terms-table";
+import { getCurrentUser } from "@/lib/auth";
+import { canManageCatalogos } from "@/lib/permissions";
+import { redirect } from "next/navigation";
 
 export default async function AdminCatalogosPage() {
+    const user = await getCurrentUser();
+    if (!canManageCatalogos(user)) redirect('/dashboard/propostas');
+
     // Fetch all data
     const [gasList, capacityList, unitList, paymentList] = await Promise.all([
         db.select().from(tiposGas).orderBy(asc(tiposGas.ordem)),

@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
+import { canViewProposta } from "@/lib/permissions";
 import { db } from "@/lib/db";
 import { propostas, propostaItens, unidades, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -51,8 +52,8 @@ export async function GET(
             return NextResponse.json({ error: "Proposal not found" }, { status: 404 });
         }
 
-        // Check permissions (SuperAdmin or Same Unit)
-        if (user.role !== 'superadmin' && user.unidadeId !== proposal.unidadeId) {
+        // Check permissions (respeita o escopo de visibilidade do usuário)
+        if (!canViewProposta(user, proposal)) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
